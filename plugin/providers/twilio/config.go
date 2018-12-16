@@ -1,21 +1,16 @@
-package netbox
+package twilio
 
 import (
-	"fmt"
-	"strings"
-		
 	log "github.com/sirupsen/logrus"
-
-	"net/url"
 
 	twiclient "github.com/kevinburke/twilio-go"
 )
 
 // Handles configuration and instantiates our Twilio client.
 type Config struct {
-	AccountSID string,
-	AuthToken string,
-	Endpoint string,
+	AccountSID string
+	AuthToken  string
+	Endpoint   string
 }
 
 type TerraformTwilioContext struct {
@@ -37,7 +32,7 @@ func (self *Config) Client() (interface{}, error) {
 
 	context := TerraformTwilioContext{
 		client:        client,
-		configuration: &self,
+		configuration: *self,
 	}
 
 	return &context, nil

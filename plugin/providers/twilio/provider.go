@@ -1,4 +1,4 @@
-package netbox
+package twilio
 
 import (
 	"github.com/hashicorp/terraform/helper/schema"
@@ -28,38 +28,34 @@ func providerSchema() map[string]*schema.Schema {
 		},
 		"auth_token": &schema.Schema{
 			Type:        schema.TypeString,
-			Required:	 true,
+			Required:    true,
 			Default:     "",
 			Description: "Your secret token to access your Twilio account. Keep this safe - DO NOT check this into source control!",
 		},
 		"endpoint": &schema.Schema{
-			Type:		schema.TypeString,
-			Required:	false,
-			Default:	"",
+			Type:        schema.TypeString,
+			Required:    false,
+			Default:     "",
 			Description: "Allows you to change the Twilio API endpoint. Nearly everyone will leave this blank; Twilions may find use of this setting, though!",
-		}
+		},
 	}
 }
 
 // List of supported resources and their configuration fields.
 func providerResources() map[string]*schema.Resource {
-	return map[string]*schema.Resource{
-
-	}
+	return map[string]*schema.Resource{}
 }
 
 // List of supported data sources and their configuration fields.
 func providerDataSourcesMap() map[string]*schema.Resource {
-	return map[string]*schema.Resource{
-
-	}
+	return map[string]*schema.Resource{}
 }
 
 func providerConfigure(d *schema.ResourceData) (interface{}, error) {
 	config := Config{
-		AccountSID:    d.Get("account_sid").(string),
-		AuthToken: d.Get("auth_token").(string),
-		Endpoint: d.Get("endpoint").(string),
+		AccountSID: d.Get("account_sid").(string),
+		AuthToken:  d.Get("auth_token").(string),
+		Endpoint:   d.Get("endpoint").(string),
 	}
 	return config.Client()
 }
