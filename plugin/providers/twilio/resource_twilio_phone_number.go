@@ -37,8 +37,171 @@ func resourceTwilioPhoneNumber() *schema.Resource {
 				Type:     schema.TypeString,
 				Computed: true,
 			},
+			"friendly_name": &schema.Schema{
+				Type:     schema.TypeString,
+				Optional: true,
+			},
+			"sms": &schema.Schema{
+				Type: schema.TypeSet,
+				Elem: &schema.Resource{
+					Schema: map[string]*schema.Schema{
+						"application_sid": &schema.Schema{
+							Type:     schema.TypeString,
+							Optional: true,
+						},
+						"primary_http_method": &schema.Schema{
+							Type:     schema.TypeString,
+							Optional: true,
+						},
+						"primary_url": &schema.Schema{
+							Type:     schema.TypeString,
+							Optional: true,
+						},
+						"fallback_method": &schema.Schema{
+							Type:     schema.TypeString,
+							Optional: true,
+						},
+						"fallback_url": &schema.Schema{
+							Type:     schema.TypeString,
+							Optional: true,
+						},
+					},
+				},
+			},
+			"status_callback": &schema.Schema{
+				Type: schema.TypeSet,
+				Elem: &schema.Resource{
+					Schema: map[string]*schema.Schema{
+						"url": &schema.Schema{
+							Type:     schema.TypeString,
+							Optional: true,
+						},
+						"http_method": &schema.Schema{
+							Type:     schema.TypeString,
+							Optional: true,
+						},
+					},
+				},
+			},
+			"voice": &schema.Schema{
+				Type: schema.TypeSet,
+				Elem: &schema.Resource{
+					Schema: map[string]*schema.Schema{
+						"application_sid": &schema.Schema{
+							Type:     schema.TypeString,
+							Optional: true,
+						},
+						"primary_http_method": &schema.Schema{
+							Type:     schema.TypeString,
+							Optional: true,
+						},
+						"primary_url": &schema.Schema{
+							Type:     schema.TypeString,
+							Optional: true,
+						},
+						"fallback_method": &schema.Schema{
+							Type:     schema.TypeString,
+							Optional: true,
+						},
+						"fallback_url": &schema.Schema{
+							Type:     schema.TypeString,
+							Optional: true,
+						},
+						"caller_id_enabled": &schema.Schema{
+							Type:     schema.TypeBool,
+							Optional: true,
+						},
+						"receive_mode": &schema.Schema{
+							Type:     schema.TypeString,
+							Optional: true,
+						},
+					},
+				},
+			},
+			"address_sid": &schema.Schema{
+				Type:     schema.TypeString,
+				Optional: true,
+			},
+			"trunk_sid": &schema.Schema{
+				Type:     schema.TypeString,
+				Optional: true,
+			},
+			"identity_sid": &schema.Schema{
+				Type:     schema.TypeString,
+				Optional: true,
+			},
+			"emergency": &schema.Schema{
+				Type: schema.TypeSet,
+				Elem: &schema.Resource{
+					Schema: map[string]*schema.Schema{
+						"enabled": &schema.Schema{
+							Type:     schema.TypeBool,
+							Optional: true,
+						},
+						"address_sid": &schema.Schema{
+							Type:     schema.TypeString,
+							Optional: true,
+						},
+					},
+				},
+			},
 		},
 	}
+}
+
+func flattenPhoneNumber(d *schema.ResourceData) url.Values {
+	v := make(url.Values)
+
+	v.Add("FriendlyName", d.Get("friendly_name").(string))
+	v.Add("AddressSid", d.Get("address_sid").(string))
+	v.Add("TrunkSid", d.Get("trunk_sid").(string))
+	v.Add("IdentitySid", d.Get("identity_sid").(string))
+
+	// TODO SMS
+
+	if sms := d.Get("sms").(*schema.Set); sms.Len() > 0 {
+		sms := sms.List()[0].(map[string]interface{})
+
+		v.Add("SmsApplicationSid", sms["application_sid"].(string))
+		v.Add("SmsFallbackUrl", sms["fallback_url"].(string))
+		v.Add("SmsFallbackMethod", sms["fallback_http_method"].(string)) // TODO Map to safe values
+		v.Add("SmsMethod", sms["primary_http_method"].(string))          // TODO Map to safe values
+		v.Add("SmsUrl", sms["primary_url"].(string))
+	}
+
+	// TODO Voice
+
+	if voice := d.Get("voice").(*schema.Set); voice.Len() > 0 {
+		voice := voice.List()[0].(map[string]interface{})
+
+		v.Add("VoiceApplicationSid", voice["application_sid"].(string))
+		v.Add("VoiceFallbackUrl", voice["fallback_url"].(string))
+		v.Add("VoiceFallbackMethod", voice["fallback_http_method"].(string)) // TODO Map to safe values
+		v.Add("VoiceMethod", voice["primary_http_method"].(string))          // TODO Map to safe values
+		v.Add("VoiceUrl", voice["primary_url"].(string))
+		v.Add("VoiceCallerIdLookup", voice["caller_id_enabled"].(string))
+		v.Add("VoiceReceiveMode", voice["recieve_mode"].(string)) // TODO Map to Twilio values
+	}
+
+	// TODO Status Callback
+
+	if statusCallback := d.Get("status_callback").(*schema.Set); statusCallback.Len() > 0 {
+		statusCallback := statusCallback.List()[0].(map[string]interface{})
+
+		v.Add("SmsMethod", statusCallback["primary_http_method"].(string)) // TODO Map to safe values
+		v.Add("SmsUrl", statusCallback["primary_url"].(string))
+	}
+
+	// TODO Emergency
+
+	if emergency := d.Get("emergency").(*schema.Set); emergency.Len() > 0 {
+		emergency := emergency.List()[0].(map[string]interface{})
+
+		v.Add("EmergencyStatus", emergency["enabled"].(string)) // TODO Map to Twilio values
+		v.Add("EmergencyAddressSid", emergency["address_sid"].(string))
+	}
+
+	return v
 }
 
 func resourceTwilioPhoneNumberCreate(d *schema.ResourceData, meta interface{}) error {
