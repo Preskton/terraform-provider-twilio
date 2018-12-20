@@ -3,6 +3,7 @@ package twilio
 import (
 	"context"
 	"errors"
+	"fmt"
 	"net/url"
 
 	"github.com/hashicorp/terraform/helper/schema"
@@ -42,7 +43,10 @@ func resourceTwilioPhoneNumber() *schema.Resource {
 				Optional: true,
 			},
 			"sms": &schema.Schema{
-				Type: schema.TypeSet,
+				Type:     schema.TypeSet,
+				MinItems: 0,
+				MaxItems: 1,
+				Optional: true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						"application_sid": &schema.Schema{
@@ -69,7 +73,10 @@ func resourceTwilioPhoneNumber() *schema.Resource {
 				},
 			},
 			"status_callback": &schema.Schema{
-				Type: schema.TypeSet,
+				Type:     schema.TypeSet,
+				MinItems: 0,
+				MaxItems: 1,
+				Optional: true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						"url": &schema.Schema{
@@ -84,7 +91,10 @@ func resourceTwilioPhoneNumber() *schema.Resource {
 				},
 			},
 			"voice": &schema.Schema{
-				Type: schema.TypeSet,
+				Type:     schema.TypeSet,
+				MinItems: 0,
+				MaxItems: 1,
+				Optional: true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						"application_sid": &schema.Schema{
@@ -131,7 +141,10 @@ func resourceTwilioPhoneNumber() *schema.Resource {
 				Optional: true,
 			},
 			"emergency": &schema.Schema{
-				Type: schema.TypeSet,
+				Type:     schema.TypeSet,
+				MinItems: 0,
+				MaxItems: 1,
+				Optional: true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						"enabled": &schema.Schema{
@@ -279,7 +292,40 @@ func resourceTwilioPhoneNumberCreate(d *schema.ResourceData, meta interface{}) e
 }
 
 func resourceTwilioPhoneNumberRead(d *schema.ResourceData, meta interface{}) error {
-	return errors.New("Not implemented")
+	log.Debug("ENTER resourceTwilioPhoneNumberDelete")
+
+	client := meta.(*TerraformTwilioContext).client
+	config := meta.(*TerraformTwilioContext).configuration
+	context := context.TODO()
+
+	sid := d.Id()
+	phoneNumber := d.Get("phone_number").(string)
+
+	log.WithFields(
+		log.Fields{
+			"account_sid":      config.AccountSID,
+			"phone_number":     phoneNumber,
+			"phone_number_sid": sid,
+		},
+	).Debug("START client.IncomingNumbers.Release")
+
+	ph, err := client.IncomingNumbers.Get(context, sid)
+
+	fmt.Printf(ph.APIVersion)
+
+	log.WithFields(
+		log.Fields{
+			"account_sid":      config.AccountSID,
+			"phone_number":     phoneNumber,
+			"phone_number_sid": sid,
+		},
+	).Debug("END client.IncomingNumbers.Release")
+
+	if err != nil {
+		return fmt.Errorf("Failed to delete/release number: %s", err.Error())
+	}
+
+	return nil
 }
 
 func resourceTwilioPhoneNumberUpdate(d *schema.ResourceData, meta interface{}) error {
@@ -287,5 +333,36 @@ func resourceTwilioPhoneNumberUpdate(d *schema.ResourceData, meta interface{}) e
 }
 
 func resourceTwilioPhoneNumberDelete(d *schema.ResourceData, meta interface{}) error {
-	return errors.New("Not implemented")
+	log.Debug("ENTER resourceTwilioPhoneNumberDelete")
+
+	client := meta.(*TerraformTwilioContext).client
+	config := meta.(*TerraformTwilioContext).configuration
+	context := context.TODO()
+
+	sid := d.Id()
+	phoneNumber := d.Get("phone_number").(string)
+
+	log.WithFields(
+		log.Fields{
+			"account_sid":      config.AccountSID,
+			"phone_number":     phoneNumber,
+			"phone_number_sid": sid,
+		},
+	).Debug("START client.IncomingNumbers.Release")
+
+	err := client.IncomingNumbers.Release(context, sid)
+
+	log.WithFields(
+		log.Fields{
+			"account_sid":      config.AccountSID,
+			"phone_number":     phoneNumber,
+			"phone_number_sid": sid,
+		},
+	).Debug("END client.IncomingNumbers.Release")
+
+	if err != nil {
+		return fmt.Errorf("Failed to delete/release number: %s", err.Error())
+	}
+
+	return nil
 }
