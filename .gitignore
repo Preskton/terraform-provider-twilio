@@ -22,3 +22,6 @@ terraform.tfstate.*.backup
 
 pkg/
 temp/
+
+terraform-provider-twilio
+terraform-provider-twilio.exe
