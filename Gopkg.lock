@@ -99,6 +99,22 @@
   revision = "4a1e882c79dcf4ec00d2e29fac74b9c8938d5052"
 
 [[projects]]
+  digest = "1:af43bdaaf86655a2343f113e9b293bbc16b12099eaeb223982bbe4d4c22ba14d"
+  name = "github.com/fatih/structs"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "4966fc68f5b7593aafa6cbbba2d65ec6e1416047"
+  version = "v1.1.0"
+
+[[projects]]
+  digest = "1:060e2ff7ee3e51b4a0fadf46308033bfe3b8030af6a8078ec26916e2e9b2fdc3"
+  name = "github.com/fatih/structtag"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "76ae1d6d2117609598c7d4e8f3e938145f204e8f"
+  version = "v1.0.0"
+
+[[projects]]
   digest = "1:586ea76dbd0374d6fb649a91d70d652b7fe0ccffb8910a77468e7702e7901f3d"
   name = "github.com/go-stack/stack"
   packages = ["."]
@@ -614,6 +630,8 @@
   analyzer-name = "dep"
   analyzer-version = 1
   input-imports = [
+    "github.com/fatih/structs",
+    "github.com/fatih/structtag",
     "github.com/hashicorp/terraform/helper/schema",
     "github.com/hashicorp/terraform/plugin",
     "github.com/hashicorp/terraform/terraform",
