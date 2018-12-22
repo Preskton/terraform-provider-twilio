@@ -1,8 +1,6 @@
 package twilio_test
 
 import (
-	"fmt"
-
 	"github.com/hashicorp/terraform/helper/schema"
 	. "github.com/onsi/ginkgo"
 
@@ -15,6 +13,33 @@ type helperTestData struct {
 	SomeString string `terraform:"some_string"`
 }
 
+func resourceTestWidget() *schema.Resource {
+	return &schema.Resource{
+		Create: nil,
+		Read:   nil,
+		Update: nil,
+		Delete: nil,
+		Importer: &schema.ResourceImporter{
+			State: schema.ImportStatePassthrough,
+		},
+
+		Schema: map[string]*schema.Schema{
+			"sid": &schema.Schema{
+				Type:     schema.TypeInt,
+				Computed: true,
+			},
+			"some_id": &schema.Schema{
+				Type:     schema.TypeInt,
+				Optional: true,
+			},
+			"some_string": &schema.Schema{
+				Type:     schema.TypeString,
+				Required: true,
+			},
+		},
+	}
+}
+
 var _ = Describe("Twilio Terraform Provider", func() {
 	var (
 		testData = helperTestData{SomeID: 1337, SomeString: "Yarn"}
@@ -25,10 +50,8 @@ var _ = Describe("Twilio Terraform Provider", func() {
 	Describe("Serialization helpers", func() {
 		Context("When it serializes from a struct to a Terraform ResourceData", func() {
 			BeforeEach(func() {
-				tfdata = &schema.ResourceData{}
+				tfdata = resourceTestWidget().TestResourceData()
 				err = twilio.MarshalToTerraform(testData, tfdata)
-
-				fmt.Printf("%+v\n", tfdata)
 			})
 
 			It("should not error", func() {
@@ -44,5 +67,4 @@ var _ = Describe("Twilio Terraform Provider", func() {
 			})
 		})
 	})
-
 })

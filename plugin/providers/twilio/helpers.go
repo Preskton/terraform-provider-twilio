@@ -2,7 +2,6 @@ package twilio
 
 import (
 	"errors"
-	"fmt"
 	"reflect"
 	"strings"
 
@@ -23,16 +22,15 @@ func MarshalToTerraform(src interface{}, dest *schema.ResourceData) error {
 	log.Debug("Got a good struct")
 
 	for _, field := range structs.Fields(src) {
-		name := field.Name()
-
 		tag := field.Tag("terraform")
 
 		if tag == "" {
-			return fmt.Errorf("No `terraform` tag found on %s", name)
+			continue
 		}
 
 		options := strings.Split(tag, ",")
 		tfname := options[0]
+
 		value := field.Value()
 
 		log.Debugf("Setting %s to %s", tfname, value)
