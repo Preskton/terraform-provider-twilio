@@ -8,9 +8,19 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-type helperTestData struct {
-	SomeID     int    `terraform:"some_id"`
-	SomeString string `terraform:"some_string"`
+type WeaponStats struct {
+	Power      int    `terraform:"power_value"`
+	Range      int    `terraform:"range_value"`
+	RateOfFire int    `terraform:"rof"`
+	Adjective  string `terraform:"adj"`
+	IsOP       bool   `terraform:"is_op"`
+}
+
+type Weapon struct {
+	WeaponID     int         `terraform:"weapon_id"`
+	Name         string      `terraform:"name"`
+	Manufacturer string      `terraform:"manufacturer_name"`
+	Stats        WeaponStats `terraform:"stats"`
 }
 
 func resourceTestWidget() *schema.Resource {
@@ -24,17 +34,47 @@ func resourceTestWidget() *schema.Resource {
 		},
 
 		Schema: map[string]*schema.Schema{
-			"sid": &schema.Schema{
+			"weapon_id": &schema.Schema{
 				Type:     schema.TypeInt,
 				Computed: true,
 			},
-			"some_id": &schema.Schema{
-				Type:     schema.TypeInt,
-				Optional: true,
-			},
-			"some_string": &schema.Schema{
+			"name": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
+			},
+			"manufacturer_name": &schema.Schema{
+				Type:     schema.TypeString,
+				Required: true,
+			},
+			"stats": &schema.Schema{
+				Type:     schema.TypeSet,
+				MinItems: 0,
+				MaxItems: 1,
+				Optional: true,
+				Elem: &schema.Resource{
+					Schema: map[string]*schema.Schema{
+						"power_value": &schema.Schema{
+							Type:     schema.TypeInt,
+							Optional: true,
+						},
+						"range_value": &schema.Schema{
+							Type:     schema.TypeInt,
+							Optional: true,
+						},
+						"rof": &schema.Schema{
+							Type:     schema.TypeInt,
+							Optional: true,
+						},
+						"adj": &schema.Schema{
+							Type:     schema.TypeString,
+							Optional: true,
+						},
+						"is_op": &schema.Schema{
+							Type:     schema.TypeBool,
+							Optional: true,
+						},
+					},
+				},
 			},
 		},
 	}
@@ -42,28 +82,66 @@ func resourceTestWidget() *schema.Resource {
 
 var _ = Describe("Twilio Terraform Provider", func() {
 	var (
-		testData = helperTestData{SomeID: 1337, SomeString: "Yarn"}
+		weapons = map[string]*Weapon{
+			"tkSplatRoller": &Weapon{
+				WeaponID:     1,
+				Name:         "Kensa Splat Roller",
+				Manufacturer: "Toni Kensa",
+				Stats: WeaponStats{
+					Power:      100,
+					Range:      5,
+					RateOfFire: 35,
+					Adjective:  "groovy",
+					IsOP:       true,
+				},
+			},
+		}
+		expected *Weapon
 		tfdata   *schema.ResourceData
+		tfschema map[string]*schema.Schema
 		err      error
 	)
 
-	Describe("Serialization helpers", func() {
+	Describe("Terraform Marshal", func() {
+
+		BeforeSuite(func() {
+			expected = weapons["tkSplatRoller"]
+			tfdata = resourceTestWidget().TestResourceData()
+			tfschema = resourceTestWidget().Schema
+			err = twilio.MarshalToTerraform(expected, tfdata, tfschema)
+		})
+
 		Context("When it serializes from a struct to a Terraform ResourceData", func() {
-			BeforeEach(func() {
-				tfdata = resourceTestWidget().TestResourceData()
-				err = twilio.MarshalToTerraform(testData, tfdata)
-			})
 
 			It("should not error", func() {
 				Expect(err).ShouldNot(HaveOccurred())
 			})
 
-			It("should populate the ResourceData per the struct tags", func() {
-				someID := tfdata.Get("some_id").(int)
-				Expect(someID).To(Equal(1337))
+			It("should populate basic (value-type) ResourceData per the struct tags", func() {
+				weaponID := tfdata.Get("weapon_id").(int)
+				Expect(weaponID).To(Equal(expected.WeaponID))
 
-				someString := tfdata.Get("some_string").(string)
-				Expect(someString).To(Equal("Yarn"))
+				weaponName := tfdata.Get("name").(string)
+				Expect(weaponName).To(Equal(expected.Name))
+
+				manufacturer := tfdata.Get("manufacturer_name").(string)
+				Expect(manufacturer).To(Equal(expected.Manufacturer))
+			})
+
+			It("should have at least one entry in the nested `stats` Set", func() {
+				stats := tfdata.Get("stats").(*schema.Set)
+				Expect(stats.Len()).To(Equal(1))
+			})
+
+			It("should have copied the field values into the nested `stats` Set values", func() {
+				stats := tfdata.Get("stats").(*schema.Set)
+				values := stats.List()[0].(map[string]interface{})
+
+				Expect(values["power_value"]).To(Equal(expected.Stats.Power))
+				Expect(values["range_value"]).To(Equal(expected.Stats.Range))
+				Expect(values["rof"]).To(Equal(expected.Stats.RateOfFire))
+				Expect(values["adj"]).To(Equal(expected.Stats.Adjective))
+				Expect(values["is_op"]).To(Equal(expected.Stats.IsOP))
 			})
 		})
 	})
