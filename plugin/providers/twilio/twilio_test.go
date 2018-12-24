@@ -102,9 +102,41 @@ var _ = Describe("Twilio Terraform Provider", func() {
 		err      error
 	)
 
+	Describe("Field Mapper", func() {
+		Context("When it walks a struct to get the mapped fields for `terraform`", func() {
+
+			expected = weapons["tkSplatRoller"]
+			actualMap, mappingErr := twilio.MapStructByTag(expected, "terraform")
+
+			It("should not error", func() {
+				Expect(mappingErr).ShouldNot(HaveOccurred())
+			})
+
+			It("should provide an entry per field marked with `terraform`", func() {
+				Expect(actualMap).ShouldNot(BeNil())
+				Expect(len(actualMap)).Should(Equal(4))
+
+				var ok bool
+
+				weaponID, ok := actualMap["weapon_id"]
+				Expect(ok).To(Equal(true))
+				Expect(weaponID).To(Equal(expected.WeaponID))
+
+				name, ok := actualMap["name"]
+				Expect(ok).To(Equal(true))
+				Expect(name).To(Equal(expected.Name))
+
+				manufacturer, ok := actualMap["manufacturer_name"]
+				Expect(ok).To(Equal(true))
+				Expect(manufacturer).To(Equal(expected.Manufacturer))
+			})
+
+		})
+	})
+
 	Describe("Terraform Marshal", func() {
 
-		BeforeSuite(func() {
+		BeforeEach(func() {
 			expected = weapons["tkSplatRoller"]
 			tfdata = resourceTestWidget().TestResourceData()
 			tfschema = resourceTestWidget().Schema
