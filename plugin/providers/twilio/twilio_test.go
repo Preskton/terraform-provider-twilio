@@ -17,10 +17,12 @@ type WeaponStats struct {
 }
 
 type Weapon struct {
-	WeaponID     int         `terraform:"weapon_id"`
-	Name         string      `terraform:"name"`
-	Manufacturer string      `terraform:"manufacturer_name"`
-	Stats        WeaponStats `terraform:"stats"`
+	WeaponID           int         `terraform:"weapon_id"`
+	Name               string      `terraform:"name"`
+	Manufacturer       string      `terraform:"manufacturer_name"`
+	Stats              WeaponStats `terraform:"stats"`
+	PowerUpCosts       []int       `terraform:"power_up_costs"`
+	SomethingWithNoTag int         `notthetagyourelookingfor:"lol"`
 }
 
 func resourceTestWidget() *schema.Resource {
@@ -76,6 +78,12 @@ func resourceTestWidget() *schema.Resource {
 					},
 				},
 			},
+			"power_up_costs": &schema.Schema{
+				Type: schema.TypeList,
+				Elem: &schema.Schema{
+					Type: schema.TypeInt,
+				},
+			},
 		},
 	}
 }
@@ -94,6 +102,7 @@ var _ = Describe("Twilio Terraform Provider", func() {
 					Adjective:  "groovy",
 					IsOP:       true,
 				},
+				PowerUpCosts: []int{5, 10, 15, 20, 25},
 			},
 		}
 		expected *Weapon
@@ -114,7 +123,7 @@ var _ = Describe("Twilio Terraform Provider", func() {
 
 			It("should provide an entry per field marked with `terraform`", func() {
 				Expect(actualMap).ShouldNot(BeNil())
-				Expect(len(actualMap)).Should(Equal(4))
+				Expect(len(actualMap)).Should(Equal(5))
 
 				var ok bool
 
@@ -129,6 +138,12 @@ var _ = Describe("Twilio Terraform Provider", func() {
 				manufacturer, ok := actualMap["manufacturer_name"]
 				Expect(ok).To(Equal(true))
 				Expect(manufacturer).To(Equal(expected.Manufacturer))
+			})
+
+			It("should properly handle list fields", func() {
+				powerUpCosts, ok := actualMap["power_up_costs"]
+				Expect(ok).To(Equal(true))
+				Expect(powerUpCosts).To(Equal(expected.PowerUpCosts))
 			})
 
 		})
@@ -149,7 +164,7 @@ var _ = Describe("Twilio Terraform Provider", func() {
 				Expect(err).ShouldNot(HaveOccurred())
 			})
 
-			It("should populate basic (value-type) ResourceData per the struct tags", func() {
+			It("should populate basic (value-type) ResourceData on the top level per the struct tags", func() {
 				weaponID := tfdata.Get("weapon_id").(int)
 				Expect(weaponID).To(Equal(expected.WeaponID))
 

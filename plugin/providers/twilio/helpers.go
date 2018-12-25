@@ -56,9 +56,6 @@ func MarshalToTerraform(src interface{}, dest *schema.ResourceData, sm map[strin
 			if err != nil {
 				return fmt.Errorf("Setting `%s` failed: %s", terraformFieldName, err)
 			}
-		case schema.TypeList:
-			log.Warnf("schema.TypeList not yet implemented")
-			// TODO Handle list types
 		default:
 			dest.Set(terraformFieldName, sourceValue)
 		}
@@ -80,16 +77,12 @@ func MapStructByTag(src interface{}, tagName string) (map[string]interface{}, er
 
 	for _, sourceField := range structs.Fields(src) {
 		tag := sourceField.Tag(tagName)
-
 		if tag == "" {
-			log.Debugf("Field %s doesn't have tag %s, skipping", sourceField.Name(), tagName)
 			continue
 		}
 
 		options := strings.Split(tag, ",")
-
 		if len(options) < 1 {
-			log.Debugf("Field %s doesn't have any options, skipping", sourceField.Name())
 			continue
 		}
 
