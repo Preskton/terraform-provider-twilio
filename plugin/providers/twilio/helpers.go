@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
-	"reflect"
 	"strings"
 
 	"github.com/hashicorp/terraform/helper/hashcode"
@@ -15,12 +14,7 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-type SimpleFieldMappingInstruction struct {
-	SourceField      string
-	SourceValue      interface{}
-	DestinationField string
-	DestinationValue interface{}
-}
+// TODO Move this to its own library.
 
 func MarshalToTerraform(src interface{}, dest *schema.ResourceData, sm map[string]*schema.Schema) error {
 	return marshalToTerraform(src, dest, sm)
@@ -28,21 +22,19 @@ func MarshalToTerraform(src interface{}, dest *schema.ResourceData, sm map[strin
 
 func marshalToTerraform(src interface{}, dest *schema.ResourceData, sm map[string]*schema.Schema) error {
 	if src == nil {
-		return fmt.Errorf("Source cannot be null")
+		return fmt.Errorf("src cannot be null")
 	}
 
 	if dest == nil {
-		return fmt.Errorf("Destination cannot be null")
+		return fmt.Errorf("dest cannot be null")
 	}
 
 	if sm == nil {
-		return fmt.Errorf("Schema cannot be null")
+		return fmt.Errorf("sm cannot be null")
 	}
 
-	t := reflect.TypeOf(src)
-
-	if t == nil || !structs.IsStruct(src) {
-		return errors.New("Source cannot be nil and must be a struct")
+	if !structs.IsStruct(src) {
+		return errors.New("src cannot be nil and must be a struct")
 	}
 
 	for _, sourceField := range structs.Fields(src) {
@@ -62,7 +54,7 @@ func marshalToTerraform(src interface{}, dest *schema.ResourceData, sm map[strin
 
 		if tfschema.Type == schema.TypeSet {
 			//nestedSet := dest.Get(terraformFieldName).(*schema.Set)
-			nestedSet := schema.NewSet(SimpleStructHashcode, nil)
+			nestedSet := schema.NewSet(SimpleHashcode, nil)
 
 			if !structs.IsStruct(sourceValue) {
 				return fmt.Errorf("Terraform field `%s` is a Set, but field `%s` is not a struct", terraformFieldName, sourceField.Name())
@@ -91,6 +83,9 @@ func marshalToTerraform(src interface{}, dest *schema.ResourceData, sm map[strin
 	return nil
 }
 
+// MapStructByTag takes a struct and target tag name present on fields in that struct,
+// then converts it into a map[string]interface{}. The target tag should be of the format `myTag:"destinationFieldName"`,
+// where `destinationFieldName` is a valid map[string] key.
 func MapStructByTag(src interface{}, tagName string) (map[string]interface{}, error) {
 	if src == nil || !structs.IsStruct(src) {
 		return nil, errors.New("Source cannot be nil and must be a struct")
@@ -122,13 +117,9 @@ func MapStructByTag(src interface{}, tagName string) (map[string]interface{}, er
 	return result, nil
 }
 
-type MappedField struct {
-	SourceFieldName      string
-	DestinationFieldName string
-	Value                interface{}
-}
-
-func SimpleStructHashcode(v interface{}) int {
+// SimpleHashcode calculates a simple integer hashcode by iterating over all the fields/keys in a map,
+// concating the values in buffer, then calculating the hashcode of that buffer.
+func SimpleHashcode(v interface{}) int {
 	var buf bytes.Buffer
 
 	if structs.IsStruct(v) {
@@ -139,11 +130,22 @@ func SimpleStructHashcode(v interface{}) int {
 				buf.WriteString("nil")
 			}
 		}
+	} else {
+		switch v.(type) {
+		case map[string]interface{}:
+			for _, value := range v.(map[string]interface{}) {
+				if value != nil {
+					buf.WriteString(fmt.Sprintf("%v", value))
+				} else {
+					buf.WriteString("nil")
+				}
+			}
+		default:
+			return -1
+		}
 	}
 
 	result := hashcode.String(buf.String())
-
-	log.Debugf("Calculated hashcode = %v", result)
 
 	return result
 }
