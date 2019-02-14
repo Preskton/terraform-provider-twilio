@@ -17,6 +17,8 @@ More coming soon.
 
 ## Example
 
+Note: running and applying the below could cost you REAL MONEY! Please use this tool wisely!
+
 ```hcl
 provider "twilio" {
     account_sid = "<your account sid here>"
