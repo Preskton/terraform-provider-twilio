@@ -23,7 +23,7 @@ func resourceTwilioPhoneNumber() *schema.Resource {
 
 		Schema: map[string]*schema.Schema{
 			"sid": &schema.Schema{
-				Type:     schema.TypeInt,
+				Type:     schema.TypeString,
 				Computed: true,
 			},
 			"area_code": &schema.Schema{
