@@ -6,33 +6,34 @@ import (
 	twiclient "github.com/kevinburke/twilio-go"
 )
 
-// Handles configuration and instantiates our Twilio client.
+// Config contains our different configuration attributes and instantiates our Twilio client.
 type Config struct {
 	AccountSID string
 	AuthToken  string
 	Endpoint   string
 }
 
+// TerraformTwilioContext is our Terraform context that will contain both our Twilio client and configuration for access downstream.
 type TerraformTwilioContext struct {
 	client        *twiclient.Client
 	configuration Config
 }
 
 // Client creates a Twilio client and prepares it for use with Terraform.
-func (self *Config) Client() (interface{}, error) {
+func (config *Config) Client() (interface{}, error) {
 	log.WithFields(
 		log.Fields{
-			"account_sid": self.AccountSID,
+			"account_sid": config.AccountSID,
 		},
-	).Debug("Initializing Netbox client")
+	).Debug("Initializing Twilio client")
 
 	// TODO Support unique endpoints
 
-	client := twiclient.NewClient(self.AccountSID, self.AuthToken, nil)
+	client := twiclient.NewClient(config.AccountSID, config.AuthToken, nil)
 
 	context := TerraformTwilioContext{
 		client:        client,
-		configuration: *self,
+		configuration: *config,
 	}
 
 	return &context, nil

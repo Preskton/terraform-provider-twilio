@@ -23,18 +23,16 @@ func providerSchema() map[string]*schema.Schema {
 		"account_sid": &schema.Schema{
 			Type:        schema.TypeString,
 			Required:    true,
-			Default:     "",
 			Description: "The unique ID that identifies your Twilio account. Starts with `AC` and can be found on the Settings -> General page (https://www.twilio.com/console/project/settings).",
 		},
 		"auth_token": &schema.Schema{
 			Type:        schema.TypeString,
 			Required:    true,
-			Default:     "",
 			Description: "Your secret token to access your Twilio account. Keep this safe - DO NOT check this into source control!",
 		},
 		"endpoint": &schema.Schema{
 			Type:        schema.TypeString,
-			Required:    false,
+			Optional:    true,
 			Default:     "",
 			Description: "Allows you to change the Twilio API endpoint. Nearly everyone will leave this blank; Twilions may find use of this setting, though!",
 		},
@@ -43,7 +41,9 @@ func providerSchema() map[string]*schema.Schema {
 
 // List of supported resources and their configuration fields.
 func providerResources() map[string]*schema.Resource {
-	return map[string]*schema.Resource{}
+	return map[string]*schema.Resource{
+		"twilio_phone_number": resourceTwilioPhoneNumber(),
+	}
 }
 
 // List of supported data sources and their configuration fields.

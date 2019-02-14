@@ -14,6 +14,9 @@ install: clean build
 tfplan: install
 	terraform init -upgrade && terraform plan	
 
+tfplandebug: install
+	TF_LOG=debug DEBUG=true terraform init -upgrade && terraform plan
+
 tfapply: install
 	terraform init -upgrade && terraform apply
 
