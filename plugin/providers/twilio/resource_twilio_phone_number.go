@@ -278,7 +278,7 @@ func resourceTwilioPhoneNumberCreate(d *schema.ResourceData, meta interface{}) e
 	buyResult, err := client.IncomingNumbers.Create(context, buyParams)
 
 	d.SetId(buyResult.Sid)
-	d.Set("phone_number", buyResult.PhoneNumber.Local())
+	d.Set("number", buyResult.PhoneNumber.Local())
 
 	log.WithFields(
 		log.Fields{
@@ -292,14 +292,19 @@ func resourceTwilioPhoneNumberCreate(d *schema.ResourceData, meta interface{}) e
 }
 
 func resourceTwilioPhoneNumberRead(d *schema.ResourceData, meta interface{}) error {
-	log.Debug("ENTER resourceTwilioPhoneNumberDelete")
+	log.Debug("ENTER resourceTwilioPhoneNumberRead")
 
 	client := meta.(*TerraformTwilioContext).client
 	config := meta.(*TerraformTwilioContext).configuration
 	context := context.TODO()
 
+	log.Debug("Getting SID")
+
 	sid := d.Id()
-	phoneNumber := d.Get("phone_number").(string)
+
+	log.Debug("Getting phone_number")
+
+	phoneNumber := d.Get("number").(string)
 
 	log.WithFields(
 		log.Fields{
@@ -307,7 +312,7 @@ func resourceTwilioPhoneNumberRead(d *schema.ResourceData, meta interface{}) err
 			"phone_number":     phoneNumber,
 			"phone_number_sid": sid,
 		},
-	).Debug("START client.IncomingNumbers.Release")
+	).Debug("START client.IncomingNumbers.Get")
 
 	ph, err := client.IncomingNumbers.Get(context, sid)
 
@@ -319,10 +324,10 @@ func resourceTwilioPhoneNumberRead(d *schema.ResourceData, meta interface{}) err
 			"phone_number":     phoneNumber,
 			"phone_number_sid": sid,
 		},
-	).Debug("END client.IncomingNumbers.Release")
+	).Debug("END client.IncomingNumbers.Get")
 
 	if err != nil {
-		return fmt.Errorf("Failed to delete/release number: %s", err.Error())
+		return fmt.Errorf("Failed to refresh number: %s", err.Error())
 	}
 
 	return nil
@@ -340,7 +345,7 @@ func resourceTwilioPhoneNumberDelete(d *schema.ResourceData, meta interface{}) e
 	context := context.TODO()
 
 	sid := d.Id()
-	phoneNumber := d.Get("phone_number").(string)
+	phoneNumber := d.Get("number").(string)
 
 	log.WithFields(
 		log.Fields{
