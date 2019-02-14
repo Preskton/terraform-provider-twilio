@@ -17,7 +17,7 @@ type WeaponStats struct {
 }
 
 type Weapon struct {
-	WeaponID           int         `terraform:"weapon_id"`
+	WeaponID           string      `terraform:"id"`
 	Name               string      `terraform:"name"`
 	Manufacturer       string      `terraform:"manufacturer_name"`
 	Stats              WeaponStats `terraform:"stats"`
@@ -36,10 +36,6 @@ func resourceTestWidget() *schema.Resource {
 		},
 
 		Schema: map[string]*schema.Schema{
-			"weapon_id": &schema.Schema{
-				Type:     schema.TypeInt,
-				Computed: true,
-			},
 			"name": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
@@ -92,7 +88,7 @@ var _ = Describe("Twilio Terraform Provider", func() {
 	var (
 		weapons = map[string]*Weapon{
 			"tkSplatRoller": &Weapon{
-				WeaponID:     1,
+				WeaponID:     "TK1337",
 				Name:         "Kensa Splat Roller",
 				Manufacturer: "Toni Kensa",
 				Stats: WeaponStats{
@@ -127,7 +123,7 @@ var _ = Describe("Twilio Terraform Provider", func() {
 
 				var ok bool
 
-				weaponID, ok := actualMap["weapon_id"]
+				weaponID, ok := actualMap["id"]
 				Expect(ok).To(Equal(true))
 				Expect(weaponID).To(Equal(expected.WeaponID))
 
@@ -164,10 +160,12 @@ var _ = Describe("Twilio Terraform Provider", func() {
 				Expect(err).ShouldNot(HaveOccurred())
 			})
 
-			It("should populate basic (value-type) ResourceData on the top level per the struct tags", func() {
-				weaponID := tfdata.Get("weapon_id").(int)
+			It("should properly handle the special TF_ID identifier", func() {
+				weaponID := tfdata.Id()
 				Expect(weaponID).To(Equal(expected.WeaponID))
+			})
 
+			It("should populate basic (value-type) ResourceData on the top level per the struct tags", func() {
 				weaponName := tfdata.Get("name").(string)
 				Expect(weaponName).To(Equal(expected.Name))
 
@@ -189,6 +187,12 @@ var _ = Describe("Twilio Terraform Provider", func() {
 				Expect(values["rof"]).To(Equal(expected.Stats.RateOfFire))
 				Expect(values["adj"]).To(Equal(expected.Stats.Adjective))
 				Expect(values["is_op"]).To(Equal(expected.Stats.IsOP))
+			})
+
+			It("should have properly handled the list fields", func() {
+				//powerUpCosts := tfdata.Get("power_up_costs")
+
+				//Expect(powerUpCosts).To(Equal(5))
 			})
 		})
 	})
