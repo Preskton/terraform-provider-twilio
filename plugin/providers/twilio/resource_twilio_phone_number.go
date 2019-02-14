@@ -5,6 +5,8 @@ import (
 	"errors"
 	"fmt"
 	"net/url"
+	"regexp"
+	"strings"
 
 	"github.com/hashicorp/terraform/helper/schema"
 
@@ -26,7 +28,7 @@ func resourceTwilioPhoneNumber() *schema.Resource {
 				Type:     schema.TypeString,
 				Computed: true,
 			},
-			"area_code": &schema.Schema{
+			"search": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 			},
@@ -224,24 +226,27 @@ func resourceTwilioPhoneNumberCreate(d *schema.ResourceData, meta interface{}) e
 	config := meta.(*TerraformTwilioContext).configuration
 	context := context.TODO()
 
-	log.Debug("Getting area_code and country_code")
-
-	areaCode := d.Get("area_code").(string)
-	countryCode := d.Get("country_code").(string)
-
-	log.Debug("Setting searchParams url.Values")
-
 	//var searchParams url.Values
 	searchParams := make(url.Values)
-	searchParams.Set("AreaCode", areaCode)
+
+	search := d.Get("search").(string)
+
+	if !strings.Contains(search, "*") {
+		// Assume they want to search with this as the start of the number
+		search = search + "*"
+	}
+
+	searchParams.Set("Contains", search)
+
+	countryCode := d.Get("country_code").(string)
 
 	log.WithFields(
 		log.Fields{
 			"account_sid":  config.AccountSID,
 			"country_code": countryCode,
-			"area_code":    areaCode,
+			"search":       search,
 		},
-	).Debug("START client.Available.Nubmers.Local.GetPage")
+	).Debug("START client.Available.Numbers.Local.GetPage")
 
 	// TODO switch based on the type of number to buy local, mobile, intl
 	searchResult, err := client.AvailableNumbers.Local.GetPage(context, countryCode, searchParams)
@@ -254,7 +259,7 @@ func resourceTwilioPhoneNumberCreate(d *schema.ResourceData, meta interface{}) e
 		log.Fields{
 			"account_sid":  config.AccountSID,
 			"country_code": countryCode,
-			"area_code":    areaCode,
+			"search":       search,
 			"result_count": len(searchResult.Numbers),
 		},
 	).Debug("END client.Available.Nubmers.Local.GetPage")
@@ -263,27 +268,38 @@ func resourceTwilioPhoneNumberCreate(d *schema.ResourceData, meta interface{}) e
 		return errors.New("No numbers found that match area code")
 	}
 
+	// Grab the first number that matches
 	number := searchResult.Numbers[0]
 
+	// Per https://www.twilio.com/docs/phone-numbers/api/incoming-phone-numbers#create-an-incomingphonenumber-resource
+	// the number must be in E.164 format, aka number with +, country code, number, without any other punctuation
+	re := regexp.MustCompile("[ -]")
+	e164Number := re.ReplaceAllLiteralString(number.PhoneNumber.Friendly(), "")
+
 	buyParams := make(url.Values)
-	buyParams.Set("PhoneNumber", number.PhoneNumber.Local())
+	buyParams.Set("PhoneNumber", e164Number)
+
+	friendlyName := d.Get("friendly_name").(string)
+	if len(friendlyName) > 0 {
+		buyParams.Set("FriendlyName", friendlyName)
+	}
 
 	log.WithFields(
 		log.Fields{
 			"account_sid":  config.AccountSID,
-			"phone_number": number.PhoneNumber.Local(),
+			"phone_number": e164Number,
 		},
 	).Debug("START client.IncomingNumbers.Create")
 
 	buyResult, err := client.IncomingNumbers.Create(context, buyParams)
 
 	d.SetId(buyResult.Sid)
-	d.Set("number", buyResult.PhoneNumber.Local())
+	d.Set("number", e164Number)
 
 	log.WithFields(
 		log.Fields{
 			"account_sid":      config.AccountSID,
-			"phone_number":     number.PhoneNumber.Local(),
+			"phone_number":     e164Number,
 			"phone_number_sid": buyResult.Sid,
 		},
 	).Debug("END client.IncomingNumbers.Create")
