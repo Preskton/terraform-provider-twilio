@@ -25,3 +25,6 @@ temp/
 
 terraform-provider-twilio
 terraform-provider-twilio.exe
+
+# temporary while https://github.com/golang/go/issues/27925 get sorted
+go.sum
