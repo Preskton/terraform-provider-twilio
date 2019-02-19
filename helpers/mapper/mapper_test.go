@@ -190,9 +190,15 @@ var _ = Describe("Preskton's Mappers", func() {
 			})
 
 			It("should have properly handled the list fields", func() {
-				//powerUpCosts := tfdata.Get("power_up_costs")
+				powerUpCosts := tfdata.Get("power_up_costs").([]interface{})
 
-				//Expect(powerUpCosts).To(Equal(5))
+				Expect(len(powerUpCosts)).To(Equal(5))
+
+				for i := 0; i < len(powerUpCosts); i++ {
+					cost := powerUpCosts[i].(int)
+
+					Expect(cost).To(Equal(expected.PowerUpCosts[i]))
+				}
 			})
 		})
 	})
