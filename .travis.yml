@@ -22,5 +22,5 @@ notifications:
 
 script:
   - env GO111MODULE=on go build
-  - gox -osarch="linux/amd64 windows/amd64 darwin/amd64" -output="pkg/{{.OS}}_{{.Arch}}/{{.OS}}-{{.Arch}}-terraform-provider-twilio" .
+  - env GO111MODULE=on gox -osarch="linux/amd64 windows/amd64 darwin/amd64" -output="pkg/{{.OS}}_{{.Arch}}/{{.OS}}-{{.Arch}}-terraform-provider-twilio" .
   - env GO111MODULE=on go test -v ./...
