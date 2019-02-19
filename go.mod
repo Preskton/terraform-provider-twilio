@@ -45,6 +45,8 @@ require (
 	github.com/mitchellh/mapstructure v0.0.0-20170307201123-53818660ed49
 	github.com/mitchellh/reflectwalk v0.0.0-20170726202117-63d60e9d0dbc
 	github.com/oklog/run v1.0.0
+	github.com/onsi/ginkgo v1.7.0
+	github.com/onsi/gomega v1.4.3
 	github.com/posener/complete v1.2.1
 	github.com/sirupsen/logrus v1.2.0
 	github.com/ttacon/builder v0.0.0-20170518171403-c099f663e1c2
