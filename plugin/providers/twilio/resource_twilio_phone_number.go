@@ -238,6 +238,8 @@ func resourceTwilioPhoneNumberCreate(d *schema.ResourceData, meta interface{}) e
 
 	searchParams.Set("Contains", search)
 
+	client.Accounts.Create
+
 	countryCode := d.Get("country_code").(string)
 
 	log.WithFields(

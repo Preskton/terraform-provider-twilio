@@ -12,8 +12,19 @@ Current features:
     - Number prefix (or place * wherever you'd like!)
   - Purchase (`terraform apply`)
   - Delete/release (`terraform destroy`)
+- `twilio_subaccount`
+  - Create
+  - Update
+  - Delete
 
 More coming soon.
+
+## Getting Started
+
+1. Start a trial account at twilio.com (if you don't have one already). Use the Console Dashboard to take note of your Account SID (a long string starts with `AC` and looks like a GUID) and Auth Token (also a long GUID-like string, hidden under the `View` link).
+2. Download the latest release of the provider and place in your `~/.terraform.d/plugins` directory.
+3. Use the example below, replacing `account_sid` and `auth_token` with the appropriate values.
+4. `terraform apply` Note: this will cost you REAL MONEY (or at the very least trial credits).
 
 ## Example
 
@@ -23,6 +34,10 @@ Note: running and applying the below could cost you REAL MONEY! Please use this 
 provider "twilio" {
     account_sid = "<your account sid here>"
     auth_token = "<your auth token here>"
+}
+
+resource "twilio_subaccount" "woomy" {
+    friendly_name = "Woomy Subaccount #1"
 }
 
 resource "twilio_phone_number" "us_dallas_tx" {
