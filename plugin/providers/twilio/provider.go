@@ -43,6 +43,7 @@ func providerSchema() map[string]*schema.Schema {
 func providerResources() map[string]*schema.Resource {
 	return map[string]*schema.Resource{
 		"twilio_phone_number": resourceTwilioPhoneNumber(),
+		"twilio_subaccount":   resourceTwilioSubaccount(),
 	}
 }
 
