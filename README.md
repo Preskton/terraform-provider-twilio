@@ -14,6 +14,10 @@ Current features:
   - Create
   - Update
   - Delete
+- `twilio_worker`
+  - Create
+  - Update
+  - Delete
 
 More coming soon.
 
@@ -55,5 +59,10 @@ resource "twilio_subaccount" "woomy" {
 
 resource "twilio_application" "new_twiml_app" {
     friendly_name = "My new TwiML application"
+}
+
+resource "twilio_worker" "test_worker" {
+    friendly_name = "Your Name"
+    workspace_sid = "WSXXXXXXXXXXXXXX"
 }
 ```

@@ -44,6 +44,7 @@ func providerResources() map[string]*schema.Resource {
 	return map[string]*schema.Resource{
 		"twilio_subaccount":  resourceTwilioSubaccount(),
 		"twilio_application": resourceTwilioApplication(),
+		"twilio_worker":      resourceTwilioWorker(),
 	}
 }
 
