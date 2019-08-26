@@ -1,4 +1,4 @@
-module github.com/Preskton/terraform-provider-twilio
+module github.com/appian/terraform-provider-twilio
 
 require (
 	github.com/agext/levenshtein v1.2.1
