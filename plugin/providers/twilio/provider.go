@@ -42,10 +42,8 @@ func providerSchema() map[string]*schema.Schema {
 // List of supported resources and their configuration fields.
 func providerResources() map[string]*schema.Resource {
 	return map[string]*schema.Resource{
-		"twilio_subaccount":  resourceTwilioSubaccount(),
-		"twilio_application": resourceTwilioApplication(),
-		"twilio_worker":      resourceTwilioWorker(),
-		"twilio_taskQueue":   resourceTwilioTaskQueue(),
+		"twilio_phone_number": resourceTwilioPhoneNumber(),
+		"twilio_subaccount":   resourceTwilioSubaccount(),
 	}
 }
 

@@ -6,27 +6,18 @@ The goal of this Terraform provider plugin is to make manging your Twilio accoun
 
 Current features:
 
+- `twilio_phone_number`
+  - Search
+    - US & International
+    - Number prefix (or place * wherever you'd like!)
+  - Purchase (`terraform apply`)
+  - Delete/release (`terraform destroy`)
 - `twilio_subaccount`
-  - Create
-  - Update
-  - Delete
-- `twilio_application`
-  - Create
-  - Update
-  - Delete
-- `twilio_worker`
   - Create
   - Update
   - Delete
 
 More coming soon.
-
-## Build
-Run:
-```
-make plugin
-```
-to build and move the plugin to `~/.terraform.d/plugins` which is where terraform will look for all 3rd party plugins
 
 ## Getting Started
 
@@ -35,14 +26,6 @@ to build and move the plugin to `~/.terraform.d/plugins` which is where terrafor
 3. Use the example below, replacing `account_sid` and `auth_token` with the appropriate values.
 4. `terraform apply` Note: this will cost you REAL MONEY (or at the very least trial credits).
 
-## Debugging
-
-Adding the following lines to your bash profile will enable additional logging.
-```
-export TF_LOG=TRACE
-export TF_LOG_PATH=./terraform.log
-export DEBUG_HTTP_TRAFFIC=true
-```
 ## Example
 
 Note: running and applying the below could cost you REAL MONEY! Please use this tool wisely!
@@ -57,12 +40,15 @@ resource "twilio_subaccount" "woomy" {
     friendly_name = "Woomy Subaccount #1"
 }
 
-resource "twilio_application" "new_twiml_app" {
-    friendly_name = "My new TwiML application"
+resource "twilio_phone_number" "us_dallas_tx" {
+    country_code = "US"
+    search = "972"
+    friendly_name = "Howdy from TX"
 }
 
-resource "twilio_worker" "test_worker" {
-    friendly_name = "Your Name"
-    workspace_sid = "WSXXXXXXXXXXXXXX"
+resource "twilio_phone_number" "japan_somewhere" {
+    country_code = "JP"
+    search = "503*"
+    friendly_name = "日本"
 }
 ```
