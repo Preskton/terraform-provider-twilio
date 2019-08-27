@@ -3,7 +3,7 @@ package main
 import (
 	"github.com/hashicorp/terraform/plugin"
 
-	"github.com/Preskton/terraform-provider-twilio/plugin/providers/twilio"
+	"github.com/appian/terraform-provider-twilio/plugin/providers/twilio"
 
 	log "github.com/sirupsen/logrus"
 )

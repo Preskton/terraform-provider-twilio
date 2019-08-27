@@ -3,7 +3,7 @@ package twilio
 import (
 	log "github.com/sirupsen/logrus"
 
-	twiclient "github.com/kevinburke/twilio-go"
+	twiclient "github.com/appian/twilio-go"
 )
 
 // Config contains our different configuration attributes and instantiates our Twilio client.
