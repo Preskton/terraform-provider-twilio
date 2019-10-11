@@ -1,26 +1,28 @@
 language: go
-
 go:
-  - "1.11.x"
-
-before_install:  
-  - go get github.com/mitchellh/gox
-
-# Below from https://gist.github.com/y0ssar1an/df2dab474520c4086926f672c52db139
-
-# Only clone the most recent commit.
+- 1.11.x
+before_install:
+- go get github.com/mitchellh/gox
 git:
   depth: 1
-
-# Skip the install step. Don't `go get` dependencies. Only build with the code
-# in vendor/
 install: true
-
-# Don't email me the results of the test runs.
 notifications:
   email: false
-
 script:
-  - env GO111MODULE=on go build
-  - env GO111MODULE=on gox -osarch="linux/amd64 windows/amd64 darwin/amd64" -output="pkg/{{.OS}}_{{.Arch}}/{{.OS}}-{{.Arch}}-terraform-provider-twilio" .
-  - env GO111MODULE=on go test -v ./...
+- env GO111MODULE=on go build
+- env GO111MODULE=on gox -osarch="linux/amd64 windows/amd64 darwin/amd64" -output="terraform-provider-twilio_${TRAVIS_TAG}_{{.OS}}_{{.Arch}}"
+  .
+- env GO111MODULE=on go test -v ./...
+deploy:
+  provider: releases
+  api_key:
+    secure: FumkHYyjilwzHeZcoS99XTusg0lxgxoRzkm3blc9jFschevyRP+QjE884T5egAvyD8lx0dWyqQuISAeqwsfy3ypmAe0E3s2i93H+owuDGPawnNG8wliAYAHCYDdBWjRehv/4+VJwStcxwSfZOSPFb2hIrSfQ4+TH3rYZKTWSUu4BjiK/OaLulyu29U50lTPro8zpqixj3HwsL+dMiOZ7DIMC2DTgX47yckZT+iyB09rIgWYGO5Ml7CH8vbHKneecea7Z20s1ajjv6MvNFRL7HfHuHOzYg2M4ejyyxKIi3EYgAy26QaHG1cucwwXwRzjVhwLDqosiyoocDxgmtkwqgjXtaNyOlRxYTaASvv0WCZ3zda4BH2nhV/hb5FDUkxzGEv2I8xc1b9VRLVP4LDBgK4CifSNu10p4omfNPDmp8jr3YSKZ1XDgB7wyFNZ2DE6YaQdnQ5iM8B4FmUo6F+g/SiXx7H/iULpfuOjzpC45Ax2Yy4uk36y6E+DZ6/PKb7jpdOhnYr/y1vCrngNBCHbxWPcTreWOtJ4tNq8+jsCHkCdFIblpPEbFmh1sk0Zco1SbeiwBOrnGWpTmoim1Zexi/2UJnPQhS5GlT4LMk6xF8/OPYskeG1zGUtjUq0dX+7Sly6s2CMw8hCiPMSc5Wgo4/Gio9WdLJPxxX0O7hl8OiZ8=
+  file: terraform-provider-twilio*
+  skip_cleanup: true
+  file_glob: true
+  draft: true
+  on:
+    repo: Preskton/terraform-provider-twilio
+    tags: true
+    branch: master
+    go: '1.11.x'
