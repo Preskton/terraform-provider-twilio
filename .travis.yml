@@ -24,4 +24,4 @@ deploy:
     repo: Preskton/terraform-provider-twilio
     tags: true
     branch: master
-    go: '1.11.x'    
+    go: '1.11.x'
