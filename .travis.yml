@@ -20,6 +20,7 @@ deploy:
   file: terraform-provider-twilio*
   skip_cleanup: true
   file_glob: true
+  draft: true
   on:
     repo: Preskton/terraform-provider-twilio
     tags: true
