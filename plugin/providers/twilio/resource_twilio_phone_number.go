@@ -177,15 +177,15 @@ func resourceTwilioPhoneNumber() *schema.Resource {
 				Optional: true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
-						"enabled": &schema.Schema{
-							Type:     schema.TypeBool,
+						"status": &schema.Schema{
+							Type:     schema.TypeString,
 							Optional: true,
-							Description: "Whether or not emergency calls are allowed from this phone number.",
+							Description: "Status of this phone number. Either `active` or `inactive`.",
 						},
 						"address_sid": &schema.Schema{
 							Type:     schema.TypeString,
 							Optional: true,
-							Description: "SID of the address used for emergency calling from this number.",
+							Description: "SID of the address used for emergency calling from this number. The address must be validated before it can be used for emergency purposes.",
 						},
 					},
 				},
