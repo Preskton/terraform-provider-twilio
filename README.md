@@ -6,18 +6,21 @@ The goal of this Terraform provider plugin is to make manging your Twilio accoun
 
 Current features:
 
+- Compatible with Terraform `v0.12.10`
 - `twilio_phone_number`
   - Search
-    - US & International
+    - Country code
+    - Area Code
     - Number prefix (or place * wherever you'd like!)
-  - Purchase (`terraform apply`)
-  - Delete/release (`terraform destroy`)
+  - Create/Purchase
+  - Update
+  - Delete/Release
 - `twilio_subaccount`
   - Create
   - Update
   - Delete
 
-More coming soon.
+More coming eventually!
 
 ## Getting Started
 
@@ -40,15 +43,61 @@ resource "twilio_subaccount" "woomy" {
     friendly_name = "Woomy Subaccount #1"
 }
 
-resource "twilio_phone_number" "us_dallas_tx" {
+resource "twilio_phone_number" "area_code_test" {
+    // Find a number
     country_code = "US"
-    search = "972"
-    friendly_name = "Howdy from TX"
+    area_code = "972"
+    friendly_name = "terraform-provider-twilio area code test number"
+
+    // Configure your number
+
+    address_sid = "ADXXXX"          // Certain countries may require a validated address!
+    identity_sid = "IDXXXX"         // Certain countries may require a validated identity!
+    trunk_sid = "XXXXX"
+
+    voice {                
+        primary_url = "https://genoq.com/handlers/voice-primary"
+        primary_http_method = "POST"
+        fallback_url = "https://genoq.com/handlers/voice-fallback"
+        fallback_http_method = "GET"
+        caller_id_enabled = "true"
+        receive_mode = "voice"
+    }
+
+    sms {
+        primary_url = "https://genoq.com/handlers/sms-primary"
+        primary_http_method = "POST"
+        fallback_url = "https://genoq.com/handlers/sms-fallback"
+        fallback_http_method = "GeT"
+    }
+
+    status_callback {
+        url = "https://genoq.com/handlers/status-callback"
+        http_method = "GET"
+    }
+
+    // Note: Emergency calling requires a validated address
+    emergency {
+        address_sid = "ADXXXXX"
+        status = "active"
+    }
 }
 
-resource "twilio_phone_number" "japan_somewhere" {
-    country_code = "JP"
-    search = "503*"
-    friendly_name = "日本"
+resource "twilio_phone_number" "search_test" {
+    country_code = "US"
+    search = "972*"
+    friendly_name = "terraform-provider-twilio by-search test number"
+
+    sms {
+        primary_url = "https://genoq.com/handlers/sms-primary"
+        primary_http_method = "POST"
+        fallback_url = "https://genoq.com/handlers/sms-fallback"
+        fallback_http_method = "GET"        
+    }
+
+    voice {
+        receive_mode = "fax"
+        application_sid = "APXXXXX"
+    }    
 }
 ```
