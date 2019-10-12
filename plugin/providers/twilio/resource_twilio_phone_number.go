@@ -28,26 +28,32 @@ func resourceTwilioPhoneNumber() *schema.Resource {
 			"sid": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
+				Description: "The unique identifier for this phone number.",
 			},
 			"search": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
+				Description: "Look for this number sequence anywhere in the phone number.",
 			},
 			"area_code": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
+				Description: "Look for a number within this area code.",
 			},			
 			"country_code": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
+				Description: "Two letter ISO country code in which you want to search for a number. See https://support.twilio.com/hc/en-us/articles/223183068-Twilio-international-phone-number-availability-and-their-capabilities for details on available countries.",
 			},
 			"number": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
+				Description: "The full phone number, including country and area code.",
 			},
 			"friendly_name": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
+				Description: "A friendly, human-readable name by which you can refer to this number.",
 			},
 			"sms": &schema.Schema{
 				Type:     schema.TypeSet,
@@ -59,22 +65,27 @@ func resourceTwilioPhoneNumber() *schema.Resource {
 						"application_sid": &schema.Schema{
 							Type:     schema.TypeString,
 							Optional: true,
+							Description: "SID of the Twilio application to invoke when an SMS is sent to this number.",
 						},
 						"primary_http_method": &schema.Schema{
 							Type:     schema.TypeString,
 							Optional: true,
+							Description: "The HTTP method for the primary URL. Can be `GET` or `POST`, defaults to `POST`.",
 						},
 						"primary_url": &schema.Schema{
 							Type:     schema.TypeString,
 							Optional: true,
+							Description: "The URL called when an SMS is sent to this number.",
 						},
 						"fallback_http_method": &schema.Schema{
 							Type:     schema.TypeString,
 							Optional: true,
+							Description: "The HTTP method for the fallback URL. Can be `GET` or `POST`, defaults to `POST`.",
 						},
 						"fallback_url": &schema.Schema{
 							Type:     schema.TypeString,
 							Optional: true,
+							Description: "The URL called if the primary URL returns a non-favorable status code.",
 						},
 					},
 				},
@@ -89,10 +100,12 @@ func resourceTwilioPhoneNumber() *schema.Resource {
 						"url": &schema.Schema{
 							Type:     schema.TypeString,
 							Optional: true,
+							Description: "The URL called when a whenever a status change occurs on this number.",
 						},
 						"http_method": &schema.Schema{
 							Type:     schema.TypeString,
 							Optional: true,
+							Description: "The HTTP method for the status callback URL. Can be `GET` or `POST`, defaults to `POST`.",
 						},
 					},
 				},
@@ -107,45 +120,55 @@ func resourceTwilioPhoneNumber() *schema.Resource {
 						"application_sid": &schema.Schema{
 							Type:     schema.TypeString,
 							Optional: true,
+							Description: "SID of the Twilio application to invoke when a call is started with this number.",
 						},
 						"primary_http_method": &schema.Schema{
 							Type:     schema.TypeString,
 							Optional: true,
+							Description: "The HTTP method for the primary URL. Can be `GET` or `POST`, defaults to `POST`.",
 						},
 						"primary_url": &schema.Schema{
 							Type:     schema.TypeString,
 							Optional: true,
+							Description: "The URL called when a phone call starts on this number.",
 						},
 						"fallback_http_method": &schema.Schema{
 							Type:     schema.TypeString,
 							Optional: true,
+							Description: "The HTTP method for the fallback URL. Can be `GET` or `POST`, defaults to `POST`.",
 						},
 						"fallback_url": &schema.Schema{
 							Type:     schema.TypeString,
 							Optional: true,
+							Description: "The URL called if the primary URL returns a non-favorable status code.",
 						},
 						"caller_id_enabled": &schema.Schema{
 							Type:     schema.TypeBool,
 							Optional: true,
+							Description: "If caller ID is enabled or not for this number. If enabled, incurs additional charge per call (see console for pricing). Can be `true` or `false`, defaults to `false`.",
 						},
 						"receive_mode": &schema.Schema{
 							Type:     schema.TypeString,
 							Optional: true,
-						},
+							Description: "Determines if the line is set up for voice or fax. Can be `voice` or `fax`, defaults to `voice`.",
+						},						
 					},
 				},
 			},
 			"address_sid": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
+				Description: "SID of the address associated with this phone number. May be required for certain countries.",
 			},
 			"trunk_sid": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
+				Description: "SID of the voice trunk that will handle calls to this number. If set, overrides any voice URLs or applications: only the trunk will recieve the incoming call.",
 			},
 			"identity_sid": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
+				Description: "SID of the identity associated with the phone number. May be required in certain countries.",
 			},
 			"emergency": &schema.Schema{
 				Type:     schema.TypeSet,
@@ -157,10 +180,12 @@ func resourceTwilioPhoneNumber() *schema.Resource {
 						"enabled": &schema.Schema{
 							Type:     schema.TypeBool,
 							Optional: true,
+							Description: "Whether or not emergency calls are allowed from this phone number.",
 						},
 						"address_sid": &schema.Schema{
 							Type:     schema.TypeString,
 							Optional: true,
+							Description: "SID of the address used for emergency calling from this number.",
 						},
 					},
 				},
@@ -210,8 +235,8 @@ func makeCreateRequestPayload(d *schema.ResourceData) url.Values {
 	if statusCallback := d.Get("status_callback").(*schema.Set); statusCallback.Len() > 0 {
 		statusCallback := statusCallback.List()[0].(map[string]interface{})
 
-		addIfNotEmpty(createRequestPayload, "SmsMethod", statusCallback["primary_http_method"]) // TODO Map to safe values
-		addIfNotEmpty(createRequestPayload, "SmsUrl", statusCallback["primary_url"])
+		addIfNotEmpty(createRequestPayload, "StatusCallbackMethod", statusCallback["http_method"]) // TODO Map to safe values
+		addIfNotEmpty(createRequestPayload, "StatusCallbackUrl", statusCallback["url"])
 	}
 
 	if emergency := d.Get("emergency").(*schema.Set); emergency.Len() > 0 {
