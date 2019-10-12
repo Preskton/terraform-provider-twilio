@@ -229,14 +229,14 @@ func makeCreateRequestPayload(d *schema.ResourceData) url.Values {
 		addIfNotEmpty(createRequestPayload, "VoiceMethod", voice["primary_http_method"])          // TODO Map to safe values
 		addIfNotEmpty(createRequestPayload, "VoiceUrl", voice["primary_url"])
 		addIfNotEmpty(createRequestPayload, "VoiceCallerIdLookup", voice["caller_id_enabled"])
-		addIfNotEmpty(createRequestPayload, "VoiceReceiveMode", voice["recieve_mode"]) // TODO Map to Twilio 
+		addIfNotEmpty(createRequestPayload, "VoiceReceiveMode", voice["receive_mode"]) // TODO Map to Twilio 
 	}
 
 	if statusCallback := d.Get("status_callback").(*schema.Set); statusCallback.Len() > 0 {
 		statusCallback := statusCallback.List()[0].(map[string]interface{})
 
 		addIfNotEmpty(createRequestPayload, "StatusCallbackMethod", statusCallback["http_method"]) // TODO Map to safe values
-		addIfNotEmpty(createRequestPayload, "StatusCallbackUrl", statusCallback["url"])
+		addIfNotEmpty(createRequestPayload, "StatusCallback", statusCallback["url"])
 	}
 
 	if emergency := d.Get("emergency").(*schema.Set); emergency.Len() > 0 {
@@ -405,7 +405,33 @@ func resourceTwilioPhoneNumberRead(d *schema.ResourceData, meta interface{}) err
 }
 
 func resourceTwilioPhoneNumberUpdate(d *schema.ResourceData, meta interface{}) error {
-	return errors.New("Not implemented")
+	log.Debug("ENTER resourceTwilioPhoneNumberDelete")
+
+	client := meta.(*TerraformTwilioContext).client
+	config := meta.(*TerraformTwilioContext).configuration
+	context := context.TODO()
+
+	sid := d.Id()	
+
+	updatePayload := makeCreateRequestPayload(d)
+
+	//phoneNumber := d.Get("number").(string)
+	//updatePayload.Set("PhoneNumber", e164Number)
+
+	log.WithFields(
+		log.Fields{
+			"account_sid":  config.AccountSID,
+			"phone_sid": sid,
+		},
+	).Debug("START client.IncomingNumbers.Update")
+
+	_, err := client.IncomingNumbers.Update(context, sid, updatePayload)
+
+	if err != nil {
+		return fmt.Errorf("Failed to update phone number SID %s: %s", sid, err)
+	}
+
+	return nil
 }
 
 func resourceTwilioPhoneNumberDelete(d *schema.ResourceData, meta interface{}) error {
