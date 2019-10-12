@@ -6,6 +6,7 @@ The goal of this Terraform provider plugin is to make manging your Twilio accoun
 
 Current features:
 
+- Compatible with Terraform `v0.12.10`
 - `twilio_phone_number`
   - Search
     - Country code

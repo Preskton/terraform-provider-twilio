@@ -10,7 +10,7 @@ notifications:
   email: false
 script:
 - env GO111MODULE=on go build
-- env GO111MODULE=on gox -osarch="linux/amd64 windows/amd64 darwin/amd64" -output="terraform-provider-twilio_${TRAVIS_TAG}_{{.OS}}_{{.Arch}}"
+- env GO111MODULE=on gox -osarch="linux/amd64 windows/amd64 darwin/amd64" -output="terraform-provider-twilio_v${TRAVIS_TAG}_{{.OS}}_{{.Arch}}"
   .
 - env GO111MODULE=on go test -v ./...
 deploy:
