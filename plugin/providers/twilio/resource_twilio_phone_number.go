@@ -8,6 +8,7 @@ import (
 	"regexp"
 	"strings"
 
+	"github.com/spf13/cast"
 	"github.com/hashicorp/terraform/helper/schema"
 
 	log "github.com/sirupsen/logrus"
@@ -30,8 +31,12 @@ func resourceTwilioPhoneNumber() *schema.Resource {
 			},
 			"search": &schema.Schema{
 				Type:     schema.TypeString,
-				Required: true,
+				Optional: true,
 			},
+			"area_code": &schema.Schema{
+				Type:     schema.TypeString,
+				Optional: true,
+			},			
 			"country_code": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
@@ -63,7 +68,7 @@ func resourceTwilioPhoneNumber() *schema.Resource {
 							Type:     schema.TypeString,
 							Optional: true,
 						},
-						"fallback_method": &schema.Schema{
+						"fallback_http_method": &schema.Schema{
 							Type:     schema.TypeString,
 							Optional: true,
 						},
@@ -111,7 +116,7 @@ func resourceTwilioPhoneNumber() *schema.Resource {
 							Type:     schema.TypeString,
 							Optional: true,
 						},
-						"fallback_method": &schema.Schema{
+						"fallback_http_method": &schema.Schema{
 							Type:     schema.TypeString,
 							Optional: true,
 						},
@@ -164,59 +169,59 @@ func resourceTwilioPhoneNumber() *schema.Resource {
 	}
 }
 
-func flattenPhoneNumber(d *schema.ResourceData) url.Values {
-	v := make(url.Values)
+func addIfNotEmpty(params url.Values, key string, value interface{}) {
+	s := cast.ToString(value)
 
-	v.Add("FriendlyName", d.Get("friendly_name").(string))
-	v.Add("AddressSid", d.Get("address_sid").(string))
-	v.Add("TrunkSid", d.Get("trunk_sid").(string))
-	v.Add("IdentitySid", d.Get("identity_sid").(string))
+	if s != "" {
+		params.Add(key, s)
+	}
+}
 
-	// TODO SMS
+func makeCreateRequestPayload(d *schema.ResourceData) url.Values {
+	createRequestPayload := make(url.Values)
+
+	addIfNotEmpty(createRequestPayload, "FriendlyName", d.Get("friendly_name"))
+	addIfNotEmpty(createRequestPayload, "AddressSid", d.Get("address_sid"))
+	addIfNotEmpty(createRequestPayload, "TrunkSid", d.Get("trunk_sid"))
+	addIfNotEmpty(createRequestPayload, "IdentitySid", d.Get("identity_sid"))
 
 	if sms := d.Get("sms").(*schema.Set); sms.Len() > 0 {
 		sms := sms.List()[0].(map[string]interface{})
 
-		v.Add("SmsApplicationSid", sms["application_sid"].(string))
-		v.Add("SmsFallbackUrl", sms["fallback_url"].(string))
-		v.Add("SmsFallbackMethod", sms["fallback_http_method"].(string)) // TODO Map to safe values
-		v.Add("SmsMethod", sms["primary_http_method"].(string))          // TODO Map to safe values
-		v.Add("SmsUrl", sms["primary_url"].(string))
+		addIfNotEmpty(createRequestPayload, "SmsApplicationSid", sms["application_sid"])
+		addIfNotEmpty(createRequestPayload, "SmsFallbackUrl", sms["fallback_url"])
+		addIfNotEmpty(createRequestPayload, "SmsFallbackMethod", sms["fallback_http_method"])
+		addIfNotEmpty(createRequestPayload, "SmsMethod", sms["primary_http_method"])
+		addIfNotEmpty(createRequestPayload, "SmsUrl", sms["primary_url"])
 	}
-
-	// TODO Voice
 
 	if voice := d.Get("voice").(*schema.Set); voice.Len() > 0 {
 		voice := voice.List()[0].(map[string]interface{})
 
-		v.Add("VoiceApplicationSid", voice["application_sid"].(string))
-		v.Add("VoiceFallbackUrl", voice["fallback_url"].(string))
-		v.Add("VoiceFallbackMethod", voice["fallback_http_method"].(string)) // TODO Map to safe values
-		v.Add("VoiceMethod", voice["primary_http_method"].(string))          // TODO Map to safe values
-		v.Add("VoiceUrl", voice["primary_url"].(string))
-		v.Add("VoiceCallerIdLookup", voice["caller_id_enabled"].(string))
-		v.Add("VoiceReceiveMode", voice["recieve_mode"].(string)) // TODO Map to Twilio values
+		addIfNotEmpty(createRequestPayload, "VoiceApplicationSid", voice["application_sid"])
+		addIfNotEmpty(createRequestPayload, "VoiceFallbackUrl", voice["fallback_url"])
+		addIfNotEmpty(createRequestPayload, "VoiceFallbackMethod", voice["fallback_http_method"]) // TODO Map to safe values
+		addIfNotEmpty(createRequestPayload, "VoiceMethod", voice["primary_http_method"])          // TODO Map to safe values
+		addIfNotEmpty(createRequestPayload, "VoiceUrl", voice["primary_url"])
+		addIfNotEmpty(createRequestPayload, "VoiceCallerIdLookup", voice["caller_id_enabled"])
+		addIfNotEmpty(createRequestPayload, "VoiceReceiveMode", voice["recieve_mode"]) // TODO Map to Twilio 
 	}
-
-	// TODO Status Callback
 
 	if statusCallback := d.Get("status_callback").(*schema.Set); statusCallback.Len() > 0 {
 		statusCallback := statusCallback.List()[0].(map[string]interface{})
 
-		v.Add("SmsMethod", statusCallback["primary_http_method"].(string)) // TODO Map to safe values
-		v.Add("SmsUrl", statusCallback["primary_url"].(string))
+		addIfNotEmpty(createRequestPayload, "SmsMethod", statusCallback["primary_http_method"]) // TODO Map to safe values
+		addIfNotEmpty(createRequestPayload, "SmsUrl", statusCallback["primary_url"])
 	}
-
-	// TODO Emergency
 
 	if emergency := d.Get("emergency").(*schema.Set); emergency.Len() > 0 {
 		emergency := emergency.List()[0].(map[string]interface{})
 
-		v.Add("EmergencyStatus", emergency["enabled"].(string)) // TODO Map to Twilio values
-		v.Add("EmergencyAddressSid", emergency["address_sid"].(string))
+		addIfNotEmpty(createRequestPayload, "EmergencyStatus", emergency["enabled"]) // TODO Map to Twilio values
+		addIfNotEmpty(createRequestPayload, "EmergencyAddressSid", emergency["address_sid"])
 	}
 
-	return v
+	return createRequestPayload
 }
 
 func resourceTwilioPhoneNumberCreate(d *schema.ResourceData, meta interface{}) error {
@@ -229,14 +234,20 @@ func resourceTwilioPhoneNumberCreate(d *schema.ResourceData, meta interface{}) e
 	//var searchParams url.Values
 	searchParams := make(url.Values)
 
-	search := d.Get("search").(string)
-
-	if !strings.Contains(search, "*") {
-		// Assume they want to search with this as the start of the number
-		search = search + "*"
+	areaCode := d.Get("area_code").(string)
+	if len(areaCode) > 0 {
+		searchParams.Set("AreaCode", areaCode)
 	}
 
-	searchParams.Set("Contains", search)
+	search := d.Get("search").(string)	
+	if len(search) > 0 {
+		if !strings.Contains(search, "*") {
+			// Assume they want to search with this as the start of the number
+			search = search + "*"
+		}
+
+		searchParams.Set("Contains", search)
+	}
 
 	countryCode := d.Get("country_code").(string)
 
@@ -244,7 +255,6 @@ func resourceTwilioPhoneNumberCreate(d *schema.ResourceData, meta interface{}) e
 		log.Fields{
 			"account_sid":  config.AccountSID,
 			"country_code": countryCode,
-			"search":       search,
 		},
 	).Debug("START client.Available.Numbers.Local.GetPage")
 
@@ -252,6 +262,13 @@ func resourceTwilioPhoneNumberCreate(d *schema.ResourceData, meta interface{}) e
 	searchResult, err := client.AvailableNumbers.Local.GetPage(context, countryCode, searchParams)
 
 	if err != nil {
+		log.WithFields(
+			log.Fields{
+				"account_sid":  config.AccountSID,
+				"country_code": countryCode,
+			},
+		).Error("Caught an unexpected error when searching for phone numbers")
+
 		return err
 	}
 
@@ -265,7 +282,14 @@ func resourceTwilioPhoneNumberCreate(d *schema.ResourceData, meta interface{}) e
 	).Debug("END client.Available.Nubmers.Local.GetPage")
 
 	if searchResult != nil && len(searchResult.Numbers) == 0 {
-		return errors.New("No numbers found that match area code")
+		log.WithFields(
+			log.Fields{
+				"account_sid":  config.AccountSID,
+				"country_code": countryCode,
+			},
+		).Error("No phone numbers matched the search patterns")
+
+		return errors.New("No numbers found that match your search")
 	}
 
 	// Grab the first number that matches
@@ -276,13 +300,8 @@ func resourceTwilioPhoneNumberCreate(d *schema.ResourceData, meta interface{}) e
 	re := regexp.MustCompile("[ -]")
 	e164Number := re.ReplaceAllLiteralString(number.PhoneNumber.Friendly(), "")
 
-	buyParams := make(url.Values)
+	buyParams := makeCreateRequestPayload(d)
 	buyParams.Set("PhoneNumber", e164Number)
-
-	friendlyName := d.Get("friendly_name").(string)
-	if len(friendlyName) > 0 {
-		buyParams.Set("FriendlyName", friendlyName)
-	}
 
 	log.WithFields(
 		log.Fields{
@@ -292,6 +311,17 @@ func resourceTwilioPhoneNumberCreate(d *schema.ResourceData, meta interface{}) e
 	).Debug("START client.IncomingNumbers.Create")
 
 	buyResult, err := client.IncomingNumbers.Create(context, buyParams)
+
+	if err != nil {
+		log.WithFields(
+			log.Fields{
+				"account_sid":  config.AccountSID,
+				"phone_number": e164Number,
+			},
+		).Error("Caught an error when attempting to purchase phone number: " + err.Error())
+
+		return err
+	}
 
 	d.SetId(buyResult.Sid)
 	d.Set("number", e164Number)
