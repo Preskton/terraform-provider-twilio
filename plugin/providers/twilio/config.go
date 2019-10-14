@@ -3,7 +3,7 @@ package twilio
 import (
 	log "github.com/sirupsen/logrus"
 
-	twiclient "github.com/kevinburke/twilio-go"
+	twilio "github.com/kevinburke/twilio-go"
 )
 
 // Config contains our different configuration attributes and instantiates our Twilio client.
@@ -15,7 +15,7 @@ type Config struct {
 
 // TerraformTwilioContext is our Terraform context that will contain both our Twilio client and configuration for access downstream.
 type TerraformTwilioContext struct {
-	client        *twiclient.Client
+	client        *twilio.Client
 	configuration Config
 }
 
@@ -29,7 +29,7 @@ func (config *Config) Client() (interface{}, error) {
 
 	// TODO Support unique endpoints
 
-	client := twiclient.NewClient(config.AccountSID, config.AuthToken, nil)
+	client := twilio.NewClient(config.AccountSID, config.AuthToken, nil)
 
 	context := TerraformTwilioContext{
 		client:        client,
