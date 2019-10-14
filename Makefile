@@ -1,38 +1,44 @@
-build:
+.PHONY: build
+build:						## Builds for linux, windows, and darwin
 	gox -osarch="linux/amd64 windows/amd64 darwin/amd64" \
 	-output="pkg/{{.OS}}_{{.Arch}}/{{.OS}}-{{.Arch}}-terraform-provider-twilio" .
 
-test:
+.PHONY: test
+test:						## Run unit tests
 	go test -v $(shell go list ./... | grep -v /vendor/) 
 
-testacc:
+.PHONY: testacc
+testacc:					## Run acceptance tests
 	TF_ACC=1 go test -v ./plugin/providers/twilio -run="TestAcc"
 
-install: clean build
+.PHONY: install
+install: clean build		## Build and reinstall the latest version of the plugin locally
 	cp pkg/linux_amd64/linux-amd64-terraform-provider-twilio ~/.terraform.d/plugins/terraform-provider-twilio
 
-tfplan: install
+.PHONY: tfplan
+tfplan: install				## Build, install, and run terraform plan
 	terraform init -upgrade && terraform plan	
 
-tfplandebug: install
+.PHONY: tfplandebug
+tfplandebug: install		## Build, install, and run terraform plan in debug mode
 	TF_LOG=debug DEBUG=true terraform init -upgrade && terraform plan
 
-tfapply: install
+.PHONY: tfapply
+tfapply: install			## Build, install, and run terraform apply
 	terraform init -upgrade && terraform apply
 
-tfapplydebug: install
+.PHONY: tfapplydebug
+tfapplydebug: install		## Build, install, and run terraform apply in debug mode
 	TF_LOG=debug DEBUG=true terraform init -upgrade && terraform apply
 
-release: release_bump release_build
+.PHONY: bump-packages
+bump-packages:				## Updates dependencies in go.mod to latest
+	go get -u ./...
 
-release_bump:
-	scripts/release_bump.sh
-
-release_build:
-	scripts/release_build.sh
-
-deps:
-	dep ensure -vendor-only
-	
-clean:
+.PHONY: clean
+clean:						## Cleans build outputs
 	rm -rf pkg/
+
+.PHONY: help
+help:           			## Show this help
+	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
