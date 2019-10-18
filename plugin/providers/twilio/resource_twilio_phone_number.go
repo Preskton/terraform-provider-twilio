@@ -7,8 +7,7 @@ import (
 	"fmt"
 	"net/url"
 	"regexp"
-	"strings"
-
+	
 	"github.com/hashicorp/terraform/helper/hashcode"
 	"github.com/hashicorp/terraform/helper/schema"
 	twilio "github.com/kevinburke/twilio-go"
@@ -387,11 +386,6 @@ func resourceTwilioPhoneNumberCreate(d *schema.ResourceData, meta interface{}) e
 
 	search := d.Get("search").(string)
 	if len(search) > 0 {
-		if !strings.Contains(search, "*") {
-			// Assume they want to search with this as the start of the number
-			search = search + "*"
-		}
-
 		searchParams.Set("Contains", search)
 	}
 
