@@ -7,7 +7,7 @@ import (
 	"fmt"
 	"net/url"
 	"regexp"
-	
+
 	"github.com/hashicorp/terraform/helper/hashcode"
 	"github.com/hashicorp/terraform/helper/schema"
 	twilio "github.com/kevinburke/twilio-go"
@@ -27,99 +27,99 @@ func resourceTwilioPhoneNumber() *schema.Resource {
 		},
 
 		Schema: map[string]*schema.Schema{
-			"sid": &schema.Schema{
+			"sid": {
 				Type:        schema.TypeString,
 				Computed:    true,
 				Description: "The unique identifier for this phone number.",
 			},
-			"search": &schema.Schema{
+			"search": {
 				Type:        schema.TypeString,
 				Optional:    true,
 				Description: "Look for this number sequence anywhere in the phone number.",
 			},
-			"area_code": &schema.Schema{
+			"area_code": {
 				Type:        schema.TypeString,
 				Optional:    true,
 				Description: "Look for a number within this area code.",
 			},
-			"country_code": &schema.Schema{
+			"country_code": {
 				Type:        schema.TypeString,
 				Required:    true,
 				Description: "Two letter ISO country code in which you want to search for a number. See https://support.twilio.com/hc/en-us/articles/223183068-Twilio-international-phone-number-availability-and-their-capabilities for details on available countries.",
 			},
-			"number": &schema.Schema{
+			"number": {
 				Type:        schema.TypeString,
 				Computed:    true,
 				Description: "The full phone number, including country and area code.",
 			},
-			"friendly_name": &schema.Schema{
+			"friendly_name": {
 				Type:        schema.TypeString,
 				Optional:    true,
 				Description: "A friendly, human-readable name by which you can refer to this number.",
 			},
-			"date_created": &schema.Schema{
+			"date_created": {
 				Type:        schema.TypeString,
 				Computed:    true,
 				Description: "The date the phone number was created.",
 			},
-			"date_updated": &schema.Schema{
+			"date_updated": {
 				Type:        schema.TypeString,
 				Computed:    true,
 				Description: "The date the phone number was laste updated.",
 			},
-			"address_requirements": &schema.Schema{
+			"address_requirements": {
 				Type:        schema.TypeString,
 				Computed:    true,
 				Description: "Address requirements imposed on this number, if any.",
 			},
-			"is_beta": &schema.Schema{
+			"is_beta": {
 				Type:        schema.TypeBool,
 				Computed:    true,
 				Description: "Whether or not this phone number is new to Twilio (beta status).",
 			},
-			"is_mms_capable": &schema.Schema{
+			"is_mms_capable": {
 				Type:        schema.TypeBool,
 				Computed:    true,
 				Description: "Whether or not this phone number is MMS-capable.",
 			},
-			"is_sms_capable": &schema.Schema{
+			"is_sms_capable": {
 				Type:        schema.TypeBool,
 				Computed:    true,
 				Description: "Whether or not this phone number is SMS-capable.",
 			},
-			"is_voice_capable": &schema.Schema{
+			"is_voice_capable": {
 				Type:        schema.TypeBool,
 				Computed:    true,
 				Description: "Whether or not this phone number is voice-capable..",
-			},									
-			"sms": &schema.Schema{
+			},
+			"sms": {
 				Type:     schema.TypeSet,
 				MinItems: 0,
 				MaxItems: 1,
 				Optional: true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
-						"application_sid": &schema.Schema{
+						"application_sid": {
 							Type:        schema.TypeString,
 							Optional:    true,
 							Description: "SID of the Twilio application to invoke when an SMS is sent to this number.",
 						},
-						"primary_http_method": &schema.Schema{
+						"primary_http_method": {
 							Type:        schema.TypeString,
 							Optional:    true,
 							Description: "The HTTP method for the primary URL. Can be `GET` or `POST`, defaults to `POST`.",
 						},
-						"primary_url": &schema.Schema{
+						"primary_url": {
 							Type:        schema.TypeString,
 							Optional:    true,
 							Description: "The URL called when an SMS is sent to this number.",
 						},
-						"fallback_http_method": &schema.Schema{
+						"fallback_http_method": {
 							Type:        schema.TypeString,
 							Optional:    true,
 							Description: "The HTTP method for the fallback URL. Can be `GET` or `POST`, defaults to `POST`.",
 						},
-						"fallback_url": &schema.Schema{
+						"fallback_url": {
 							Type:        schema.TypeString,
 							Optional:    true,
 							Description: "The URL called if the primary URL returns a non-favorable status code.",
@@ -127,19 +127,19 @@ func resourceTwilioPhoneNumber() *schema.Resource {
 					},
 				},
 			},
-			"status_callback": &schema.Schema{
+			"status_callback": {
 				Type:     schema.TypeSet,
 				MinItems: 0,
 				MaxItems: 1,
 				Optional: true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
-						"url": &schema.Schema{
+						"url": {
 							Type:        schema.TypeString,
 							Optional:    true,
 							Description: "The URL called when a whenever a status change occurs on this number.",
 						},
-						"http_method": &schema.Schema{
+						"http_method": {
 							Type:        schema.TypeString,
 							Optional:    true,
 							Description: "The HTTP method for the status callback URL. Can be `GET` or `POST`, defaults to `POST`.",
@@ -147,7 +147,7 @@ func resourceTwilioPhoneNumber() *schema.Resource {
 					},
 				},
 			},
-			"voice": &schema.Schema{
+			"voice": {
 				Type:     schema.TypeSet,
 				MinItems: 0,
 				MaxItems: 1,
@@ -155,37 +155,37 @@ func resourceTwilioPhoneNumber() *schema.Resource {
 				Computed: true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
-						"application_sid": &schema.Schema{
+						"application_sid": {
 							Type:        schema.TypeString,
 							Optional:    true,
 							Description: "SID of the Twilio application to invoke when a call is started with this number.",
 						},
-						"primary_http_method": &schema.Schema{
+						"primary_http_method": {
 							Type:        schema.TypeString,
 							Optional:    true,
 							Description: "The HTTP method for the primary URL. Can be `GET` or `POST`, defaults to `POST`.",
 						},
-						"primary_url": &schema.Schema{
+						"primary_url": {
 							Type:        schema.TypeString,
 							Optional:    true,
 							Description: "The URL called when a phone call starts on this number.",
 						},
-						"fallback_http_method": &schema.Schema{
+						"fallback_http_method": {
 							Type:        schema.TypeString,
 							Optional:    true,
 							Description: "The HTTP method for the fallback URL. Can be `GET` or `POST`, defaults to `POST`.",
 						},
-						"fallback_url": &schema.Schema{
+						"fallback_url": {
 							Type:        schema.TypeString,
 							Optional:    true,
 							Description: "The URL called if the primary URL returns a non-favorable status code.",
 						},
-						"caller_id_enabled": &schema.Schema{
+						"caller_id_enabled": {
 							Type:        schema.TypeBool,
 							Optional:    true,
 							Description: "If caller ID is enabled or not for this number. If enabled, incurs additional charge per call (see console for pricing). Can be `true` or `false`, defaults to `false`.",
 						},
-						"receive_mode": &schema.Schema{
+						"receive_mode": {
 							Type:        schema.TypeString,
 							Optional:    true,
 							Description: "Determines if the line is set up for voice or fax. Can be `voice` or `fax`, defaults to `voice`.",
@@ -193,34 +193,34 @@ func resourceTwilioPhoneNumber() *schema.Resource {
 					},
 				},
 			},
-			"address_sid": &schema.Schema{
+			"address_sid": {
 				Type:        schema.TypeString,
 				Optional:    true,
 				Description: "SID of the address associated with this phone number. May be required for certain countries.",
 			},
-			"trunk_sid": &schema.Schema{
+			"trunk_sid": {
 				Type:        schema.TypeString,
 				Optional:    true,
 				Description: "SID of the voice trunk that will handle calls to this number. If set, overrides any voice URLs or applications: only the trunk will receive the incoming call.",
 			},
-			"identity_sid": &schema.Schema{
+			"identity_sid": {
 				Type:        schema.TypeString,
 				Optional:    true,
 				Description: "SID of the identity associated with the phone number. May be required in certain countries.",
 			},
-			"emergency": &schema.Schema{
+			"emergency": {
 				Type:     schema.TypeSet,
 				MinItems: 0,
 				MaxItems: 1,
 				Optional: true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
-						"status": &schema.Schema{
+						"status": {
 							Type:        schema.TypeString,
 							Optional:    true,
 							Description: "Status of this phone number. Either `active` or `inactive`.",
 						},
-						"address_sid": &schema.Schema{
+						"address_sid": {
 							Type:        schema.TypeString,
 							Optional:    true,
 							Description: "SID of the address used for emergency calling from this number. The address must be validated before it can be used for emergency purposes.",
@@ -468,7 +468,7 @@ func resourceTwilioPhoneNumberCreate(d *schema.ResourceData, meta interface{}) e
 
 	err = mapTwilioPhoneNumberToTerraform(buyResult, d)
 
-	if err != nil  {
+	if err != nil {
 		return fmt.Errorf("Encountered error while reading buy result for phone number SID %s and mapping it to TF: %s", buyResult.Sid, err)
 	}
 

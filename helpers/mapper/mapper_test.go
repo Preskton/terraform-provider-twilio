@@ -36,45 +36,45 @@ func resourceTestWidget() *schema.Resource {
 		},
 
 		Schema: map[string]*schema.Schema{
-			"name": &schema.Schema{
+			"name": {
 				Type:     schema.TypeString,
 				Required: true,
 			},
-			"manufacturer_name": &schema.Schema{
+			"manufacturer_name": {
 				Type:     schema.TypeString,
 				Required: true,
 			},
-			"stats": &schema.Schema{
+			"stats": {
 				Type:     schema.TypeSet,
 				MinItems: 0,
 				MaxItems: 1,
 				Optional: true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
-						"power_value": &schema.Schema{
+						"power_value": {
 							Type:     schema.TypeInt,
 							Optional: true,
 						},
-						"range_value": &schema.Schema{
+						"range_value": {
 							Type:     schema.TypeInt,
 							Optional: true,
 						},
-						"rof": &schema.Schema{
+						"rof": {
 							Type:     schema.TypeInt,
 							Optional: true,
 						},
-						"adj": &schema.Schema{
+						"adj": {
 							Type:     schema.TypeString,
 							Optional: true,
 						},
-						"is_op": &schema.Schema{
+						"is_op": {
 							Type:     schema.TypeBool,
 							Optional: true,
 						},
 					},
 				},
 			},
-			"power_up_costs": &schema.Schema{
+			"power_up_costs": {
 				Type: schema.TypeList,
 				Elem: &schema.Schema{
 					Type: schema.TypeInt,
@@ -87,7 +87,7 @@ func resourceTestWidget() *schema.Resource {
 var _ = Describe("Preskton's Mappers", func() {
 	var (
 		weapons = map[string]*Weapon{
-			"tkSplatRoller": &Weapon{
+			"tkSplatRoller": {
 				WeaponID:     "TK1337",
 				Name:         "Kensa Splat Roller",
 				Manufacturer: "Toni Kensa",

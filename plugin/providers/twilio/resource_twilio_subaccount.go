@@ -22,28 +22,28 @@ func resourceTwilioSubaccount() *schema.Resource {
 		},
 
 		Schema: map[string]*schema.Schema{
-			"parent_account_sid": &schema.Schema{
+			"parent_account_sid": {
 				Type:     schema.TypeString,
 				Computed: true,
 			},
-			"friendly_name": &schema.Schema{
+			"friendly_name": {
 				Type:     schema.TypeString,
 				Optional: true,
 			},
-			"status": &schema.Schema{
+			"status": {
 				Type:     schema.TypeString,
 				Optional: true,
 				Default:  "active",
 			},
-			"auth_token": &schema.Schema{
+			"auth_token": {
 				Type:     schema.TypeString,
 				Computed: true,
 			},
-			"date_created": &schema.Schema{
+			"date_created": {
 				Type:     schema.TypeString,
 				Computed: true,
 			},
-			"date_updated": &schema.Schema{
+			"date_updated": {
 				Type:     schema.TypeString,
 				Computed: true,
 			},

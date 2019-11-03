@@ -20,17 +20,17 @@ func Provider() terraform.ResourceProvider {
 // List of supported configuration fields for your provider.
 func providerSchema() map[string]*schema.Schema {
 	return map[string]*schema.Schema{
-		"account_sid": &schema.Schema{
+		"account_sid": {
 			Type:        schema.TypeString,
 			Required:    true,
 			Description: "The unique ID that identifies your Twilio account. Starts with `AC` and can be found on the Settings -> General page (https://www.twilio.com/console/project/settings).",
 		},
-		"auth_token": &schema.Schema{
+		"auth_token": {
 			Type:        schema.TypeString,
 			Required:    true,
 			Description: "Your secret token to access your Twilio account. Keep this safe - DO NOT check this into source control!",
 		},
-		"endpoint": &schema.Schema{
+		"endpoint": {
 			Type:        schema.TypeString,
 			Optional:    true,
 			Default:     "",
