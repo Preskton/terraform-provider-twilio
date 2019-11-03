@@ -201,7 +201,7 @@ func resourceTwilioPhoneNumber() *schema.Resource {
 			"trunk_sid": &schema.Schema{
 				Type:        schema.TypeString,
 				Optional:    true,
-				Description: "SID of the voice trunk that will handle calls to this number. If set, overrides any voice URLs or applications: only the trunk will recieve the incoming call.",
+				Description: "SID of the voice trunk that will handle calls to this number. If set, overrides any voice URLs or applications: only the trunk will receive the incoming call.",
 			},
 			"identity_sid": &schema.Schema{
 				Type:        schema.TypeString,
