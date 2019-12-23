@@ -2,7 +2,7 @@
 
 # Twilio Terraform Provider
 
-The goal of this Terraform provider plugin is to make manging your Twilio account easier.
+The goal of this Terraform provider plugin is to make managing your Twilio account easier.
 
 Current features:
 
@@ -18,6 +18,9 @@ Current features:
 - `twilio_subaccount`
   - Create
   - Update
+  - Delete
+- `twilio_api_key`
+  - Create
   - Delete
 
 More coming eventually!
@@ -43,6 +46,10 @@ resource "twilio_subaccount" "woomy" {
     friendly_name = "Woomy Subaccount #1"
 }
 
+resource "twilio_api_key" "woomy" {
+    friendly_name = "Woomy Key #1"
+}
+
 resource "twilio_phone_number" "area_code_test" {
     // Find a number
     country_code = "US"
@@ -55,7 +62,7 @@ resource "twilio_phone_number" "area_code_test" {
     identity_sid = "IDXXXX"         // Certain countries may require a validated identity!
     trunk_sid = "XXXXX"
 
-    voice {                
+    voice {
         primary_url = "https://genoq.com/handlers/voice-primary"
         primary_http_method = "POST"
         fallback_url = "https://genoq.com/handlers/voice-fallback"
@@ -92,12 +99,12 @@ resource "twilio_phone_number" "search_test" {
         primary_url = "https://genoq.com/handlers/sms-primary"
         primary_http_method = "POST"
         fallback_url = "https://genoq.com/handlers/sms-fallback"
-        fallback_http_method = "GET"        
+        fallback_http_method = "GET"
     }
 
     voice {
         receive_mode = "fax"
         application_sid = "APXXXXX"
-    }    
+    }
 }
 ```
