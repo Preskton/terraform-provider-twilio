@@ -11,12 +11,12 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-func resourceTwilioKey() *schema.Resource {
+func resourceTwilioApiKey() *schema.Resource {
 	return &schema.Resource{
-		Create: resourceTwilioKeyCreate,
-		Read:   resourceTwilioKeyRead,
-		Update: resourceTwilioKeyUpdate,
-		Delete: resourceTwilioKeyDelete,
+		Create: resourceTwilioApiKeyCreate,
+		Read:   resourceTwilioApiKeyRead,
+		Update: resourceTwilioApiKeyUpdate,
+		Delete: resourceTwilioApiKeyDelete,
 		Importer: &schema.ResourceImporter{
 			State: schema.ImportStatePassthrough,
 		},
@@ -55,8 +55,8 @@ func flattenKeyForCreate(d *schema.ResourceData) url.Values {
 	return v
 }
 
-func resourceTwilioKeyCreate(d *schema.ResourceData, meta interface{}) error {
-	log.Debug("ENTER resourceTwilioKeyCreate")
+func resourceTwilioApiKeyCreate(d *schema.ResourceData, meta interface{}) error {
+	log.Debug("ENTER resourceTwilioApiKeyCreate")
 
 	client := meta.(*TerraformTwilioContext).client
 	context := context.TODO()
@@ -85,8 +85,8 @@ func resourceTwilioKeyCreate(d *schema.ResourceData, meta interface{}) error {
 	return nil
 }
 
-func resourceTwilioKeyRead(d *schema.ResourceData, meta interface{}) error {
-	log.Debug("ENTER resourceTwilioKeyRead")
+func resourceTwilioApiKeyRead(d *schema.ResourceData, meta interface{}) error {
+	log.Debug("ENTER resourceTwilioApiKeyRead")
 
 	client := meta.(*TerraformTwilioContext).client
 	context := context.TODO()
@@ -112,12 +112,12 @@ func resourceTwilioKeyRead(d *schema.ResourceData, meta interface{}) error {
 	return nil
 }
 
-func resourceTwilioKeyUpdate(d *schema.ResourceData, meta interface{}) error {
+func resourceTwilioApiKeyUpdate(d *schema.ResourceData, meta interface{}) error {
 	return errors.New("Not implemented")
 }
 
-func resourceTwilioKeyDelete(d *schema.ResourceData, meta interface{}) error {
-	log.Debug("ENTER resourceTwilioKeyDelete")
+func resourceTwilioApiKeyDelete(d *schema.ResourceData, meta interface{}) error {
+	log.Debug("ENTER resourceTwilioApiKeyDelete")
 
 	client := meta.(*TerraformTwilioContext).client
 	context := context.TODO()

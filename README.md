@@ -19,7 +19,7 @@ Current features:
   - Create
   - Update
   - Delete
-- `twilio_key`
+- `twilio_api_key`
   - Create
   - Delete
 
@@ -46,7 +46,7 @@ resource "twilio_subaccount" "woomy" {
     friendly_name = "Woomy Subaccount #1"
 }
 
-resource "twilio_key" "woomy" {
+resource "twilio_api_key" "woomy" {
     friendly_name = "Woomy Key #1"
 }
 
