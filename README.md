@@ -108,3 +108,7 @@ resource "twilio_phone_number" "search_test" {
     }
 }
 ```
+
+## Disclaimer
+
+This is NOT an official Twilio project and is maintained in [my](https://www.github.com/Preskton) free time.
