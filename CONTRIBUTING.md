@@ -29,3 +29,21 @@ First things first, thank you for considering adding your contribution to our pr
 - Use inline comments to help deciper complex or "unique" code
 - Leverage the `logrus` logger to output logging statements - by default, prefer a `Debug` or lower level for most statements
 - If in doubt, ask! We welcome incomplete PRs if you're looking for guidance or help!
+
+### Terraform-specific
+
+#### Resource names should be underscored `_`
+
+In following with Terraform resource guidelines, words in resource names should always be underscored, ex:
+
+- `twilio_resource_name`
+- `another_resource_that_is_helpful`
+
+instead of:
+
+- `twilio_resourceName`
+- `another_resourceThatIsHelpful`
+
+#### Adding/changing a resource? Update the `README` example!
+
+If you're adding a new resource or changing an existing one, please update the `README` with a working example of your resource.
