@@ -1,5 +1,6 @@
 .PHONY: build
 build:						## Builds for linux, windows, and darwin
+	export CGO_ENABLED=0
 	gox -osarch="linux/amd64 windows/amd64 darwin/amd64" \
 	-output="pkg/{{.OS}}_{{.Arch}}/{{.OS}}-{{.Arch}}-terraform-provider-twilio" .
 
