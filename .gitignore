@@ -31,3 +31,5 @@ go.sum
 
 # since we are now doing go modules
 vendor/
+
+dist/

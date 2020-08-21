@@ -24,7 +24,6 @@ builds:
     - amd64
     - '386'
     - arm
-    - arm64
   ignore:
     - goos: darwin
       goarch: '386'
@@ -49,6 +48,6 @@ signs:
       - "${artifact}"
 release:
   # If you want to manually examine the release before its live, uncomment this line:
-  # draft: true
+  draft: true
 changelog:
   skip: true
