@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.com/Preskton/terraform-provider-twilio.svg?branch=master)](https://travis-ci.com/Preskton/terraform-provider-twilio) [![GitHub release (latest by date including pre-releases)](https://img.shields.io/github/v/release/Preskton/terraform-provider-twilio?include_prereleases)](https://github.com/Preskton/terraform-provider-twilio/releases/latest)
+[![Build Status](https://travis-ci.com/Preskton/terraform-provider-twilio.svg?branch=master)](https://travis-ci.com/Preskton/terraform-provider-twilio) [![GitHub release (latest by date including pre-releases)](https://img.shields.io/github/v/release/Preskton/terraform-provider-twilio?include_prereleases)](https://github.com/Preskton/terraform-provider-twilio/releases/latest) [![Terraform Registry](https://img.shields.io/badge/registry-twilio-green?logo=terraform&style=flat)](https://registry.terraform.io/providers/Preskton/twilio/latest)
 
 # Twilio Terraform Provider
 
