@@ -1,3 +1,8 @@
+plugin_path := ~/.terraform.d/plugins/sideload.dev/preskton/twilio/0.1.0/linux_amd64
+debug_binary_path := $(plugin_path)/terraform-provider-twilio_something
+
+
+
 .PHONY: build
 build:						## Builds for linux, windows, and darwin
 	export CGO_ENABLED=0
@@ -14,7 +19,9 @@ testacc:					## Run acceptance tests
 
 .PHONY: install
 install: clean build		## Build and reinstall the latest version of the plugin locally
-	cp pkg/linux_amd64/linux-amd64-terraform-provider-twilio ~/.terraform.d/plugins/terraform-provider-twilio
+	mkdir -p $(plugin_path)
+	cp pkg/linux_amd64/linux-amd64-terraform-provider-twilio $(debug_binary_path)
+	chmod +x $(debug_binary_path)
 
 .PHONY: tfplan
 tfplan: install				## Build, install, and run terraform plan
