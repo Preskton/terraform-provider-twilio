@@ -62,7 +62,7 @@ func flattenSubaccountForCreate(d *schema.ResourceData) url.Values {
 func flattenSubaccountForDelete(d *schema.ResourceData) url.Values {
 	v := make(url.Values)
 
-	v.Add("status", "closed")
+	v.Add("Status", "closed")
 
 	return v
 }
